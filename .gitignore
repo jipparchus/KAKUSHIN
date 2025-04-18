@@ -1,0 +1,81 @@
+# ========================
+# GLOBAL
+# ========================
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+.DS_Store
+.idea/
+.vscode/
+idea.text
+
+# ========================
+# PYTHON (backend/)
+# ========================
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+backend/config.yaml
+# Virtual environment
+backend/venv/
+backend/.mypy_cache/
+
+# auth
+backend/auth
+
+
+# ========================
+# FLUTTER (frontend/)
+# ========================
+frontend/.dart_tool/
+frontend/.packages
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.android/
+frontend/.ios/
+frontend/.gradle/
+frontend/build/
+frontend/.pub-cache/
+frontend/pubspec.lock
+
+# Android/Flutter Generated
+frontend/android
+frontend/android/app/debug
+frontend/android/app/profile
+frontend/android/app/release
+
+# iOS build
+frontend/ios
+frontend/ios/Flutter/Flutter.framework
+frontend/ios/Flutter/Flutter.podspec
+frontend/ios/ServiceDefinitions.json
+frontend/ios/Runner.xcworkspace/
+
+# CocoaPods
+frontend/ios/Pods/
+frontend/ios/Podfile.lock
+
+# Linux
+frontend/linux
+
+# macos
+frontend/macos
+
+# windows
+frontend/windows
+
+# test
+frontend/test
+
+# web
+frontend/web
+
+# ========================
+# DATABASE (database/)
+# ========================
+database/*.db
+database/uploads/
+database/secrets/

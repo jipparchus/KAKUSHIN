@@ -1,0 +1,44 @@
+"""
+Forward the port 8000 from the Android device to the host machine.
+Check the device ID with:
+adb devices
+Then:
+adb -s R52R902GW2J reverse tcp:8000 tcp:8000
+To start the server, run:
+uvicorn main:app --host localhost --port 8000
+or:
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+"""
+
+from fastapi import FastAPI
+from routes import auth_routes, upload_routes
+
+import os
+from config import config
+import db.init_rdb as init_rdb
+from db.session import SessionLocal
+
+"""
+Database initialisation
+"""
+
+if os.path.exists(config['paths']['database']):
+    pass
+else:
+    init_rdb.main()
+
+rdb = SessionLocal()
+print(rdb)
+# rdb.add(new_user)
+# rdb.commit()
+rdb.close()
+
+
+"""
+Start API
+"""
+
+# Create FastAPI instance
+app = FastAPI()
+app.include_router(auth_routes.router, prefix="/auth")
+app.include_router(upload_routes.router)
