@@ -17,7 +17,7 @@ from fastapi.responses import JSONResponse
 from config import config
 
 router = APIRouter()
-UPLOAD_DIR = config['path']['assets']
+UPLOAD_DIR = config['paths']['assets']
 
 
 def get_user_id(authorization: str = Header(...)):
@@ -51,3 +51,15 @@ async def upload_video(file: UploadFile = File(...), user_id: int = Depends(get_
         f.write(contents)
 
     return JSONResponse({"status": "success", "filename": file.filename})
+
+
+# @app.post("/create-climb")
+# def create_climb(climb: CreateClimb, db: Session = Depends(get_db)):
+#     user = db.query(User).filter_by(id=climb.user_id).first()
+#     if not user:
+#         raise HTTPException(status_code=404, detail="User not found")
+
+#     new_climb = MyClimb(name=climb.name, user_id=user.id)
+#     db.add(new_climb)
+#     db.commit()
+#     return {"status": "climb created", "climb_id": new_climb.id}
