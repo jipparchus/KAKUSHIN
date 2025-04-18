@@ -105,19 +105,19 @@ Future<void> _onSendVideo() async {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    VideoSelectorWidget(
-                      onVideoSelected: (file) {
-                        setState(() {
-                          _selectedVideo = file;
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      width: 300,
-                      child: IpInputWidget(onIpChanged: (ip) => ipAddress = ip),
-                    )
-                  ],
+                children: [
+                  VideoSelectorWidget(
+                    onVideoSelected: (file) {
+                      setState(() {
+                        _selectedVideo = file;
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    width: 300,
+                    child: IpInputWidget(onIpChanged: (ip) => ipAddress = ip),
+                  )
+                ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
