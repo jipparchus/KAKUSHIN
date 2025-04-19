@@ -16,7 +16,6 @@ from routes import auth_routes, upload_routes
 import os
 from config import config
 import db.init_rdb as init_rdb
-from db.session import SessionLocal
 
 """
 Database initialisation
@@ -27,18 +26,13 @@ if os.path.exists(config['paths']['database']):
 else:
     init_rdb.main()
 
-rdb = SessionLocal()
-print(rdb)
-# rdb.add(new_user)
-# rdb.commit()
-rdb.close()
-
-
 """
 Start API
 """
 
 # Create FastAPI instance
 app = FastAPI()
+# Authentication: Who are you?
+# Authorization: What can you do? - JWT can carry role as well.
 app.include_router(auth_routes.router, prefix="/auth")
 app.include_router(upload_routes.router)

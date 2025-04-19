@@ -24,7 +24,6 @@ backend/venv/
 backend/.mypy_cache/
 
 # auth
-backend/auth
 
 
 # ========================

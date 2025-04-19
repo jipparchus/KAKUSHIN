@@ -12,6 +12,11 @@ Used for...
 from pydantic import BaseModel
 
 
+class AuthData(BaseModel):
+    username: str
+    password: str
+
+
 class RegisterUser(BaseModel):
     username: str
     password: str

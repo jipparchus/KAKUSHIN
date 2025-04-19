@@ -71,10 +71,10 @@ class User(Base):
     )
 
     # Relationship
-    clims: Mapped[list['Climb']] = relationship(
+    myclimbs: Mapped[list['Climb']] = relationship(
         back_populates='user'
     )
-    camera_matrices: Mapped[list['CameraMatrix']] = relationship(
+    cam_matrices: Mapped[list['CameraMatrix']] = relationship(
         back_populates='user'
     )
 
@@ -90,7 +90,7 @@ class Climb(Base):
         ForeignKey('users.id'),
         nullable=False,
     )
-    camera_matrix: Mapped[uuid.UUID] = mapped_column(
+    camera_matrix_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey('camera_matrices.id'),
         nullable=False,
     )
@@ -131,7 +131,7 @@ class Climb(Base):
     )
     # Relationship
     user: Mapped['User'] = relationship(
-        back_populates='climbs'
+        back_populates='myclimbs'
     )
 
 
@@ -152,8 +152,8 @@ class CameraMatrix(Base):
         nullable=False,
     )
     # Relationship
-    camera_matrices: Mapped['User'] = relationship(
-        back_populates='user'
+    user: Mapped['User'] = relationship(
+        back_populates='cam_matrices'
     )
 
 

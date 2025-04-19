@@ -1,85 +1,142 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/pages/page_a.dart';
-import 'package:frontend/pages/page_b.dart';
-import 'package:frontend/pages/page_c.dart';
-import 'package:frontend/pages/page_d.dart';
-import 'package:frontend/pages/page_e.dart';
-import 'package:frontend/widgets/widget_side_menu.dart';
-
-main() {
-  const app = MaterialApp(
-    home: MyApp()
-    );
-  const scope = ProviderScope(child: app);
-  runApp(scope);
-}
+import 'package:frontend/pages/page_auth.dart';
 
 // Provider
-final indexProvider = StateProvider((ref) {
-  return 0;
-});
+// // Page index
+// final indexProvider = StateProvider((ref) {
+//   return 0;
+// });
+// AuthN state
+final isAuthenticatedProvider = StateProvider<bool>((ref) => false);
 
-class MyApp extends ConsumerWidget {
+void main() {
+  runApp(const ProviderScope(child: MyApp()));
+}
+
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Index
-    final index = ref.watch(indexProvider);
-    // Items
-    const items = [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.build),
-        label: 'Trim & Holding',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.crop),
-        label: 'Wall',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.polyline),
-        label: 'Key Points',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.view_in_ar),
-        label: '3D Animation',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.insights),
-        label: 'Analysis',
-      ),
-    ];
-
-    final bar = BottomNavigationBar(
-      items: items,
-      backgroundColor: const Color.fromARGB(255, 117, 192, 151),
-      selectedItemColor: Colors.black,
-      unselectedItemColor: const Color.fromARGB(255, 189, 186, 186),
-      currentIndex: index,
-      onTap: (index) {
-        // Change index
-        ref.read(indexProvider.notifier).state = index;
-      },
-    );
-
-    const pages = [
-      PageA(),
-      PageB(),
-      PageC(),
-      PageD(),
-      PageE(),
-    ];
-
-    // Drawer
-    const drawer = Drawer(
-      child: SideMenu(),
-    );
-
-    return Scaffold(
-      drawer: drawer,
-      body: pages[index],
-      bottomNavigationBar: bar,
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const AuthPage(), // Always show AuthPage first
     );
   }
 }
+
+
+
+
+
+
+
+
+
+// void main() {
+//   runApp(
+//     const ProviderScope(
+//       child: RootApp(),
+//     ),
+//   );
+// }
+
+
+// class RootApp extends ConsumerWidget {
+//   const RootApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final isAuthenticated = ref.watch(isAuthenticatedProvider);
+
+//     return MaterialApp(
+//       home: isAuthenticated ? const MyApp() : const AuthPage(),
+//     );
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // After Authenticated
+// class MyApp extends ConsumerWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     // If authenticated
+//     // final isAuthenticated = ref.watch(isAuthenticatedProvider);
+//     // Index watched
+//     final index = ref.watch(indexProvider);
+//     // Items
+//     const items = [
+//       BottomNavigationBarItem(
+//         icon: Icon(Icons.build),
+//         label: 'Trim & Holding',
+//       ),
+//       BottomNavigationBarItem(
+//         icon: Icon(Icons.crop),
+//         label: 'Wall',
+//       ),
+//       BottomNavigationBarItem(
+//         icon: Icon(Icons.polyline),
+//         label: 'Key Points',
+//       ),
+//       BottomNavigationBarItem(
+//         icon: Icon(Icons.view_in_ar),
+//         label: '3D Animation',
+//       ),
+//       BottomNavigationBarItem(
+//         icon: Icon(Icons.insights),
+//         label: 'Analysis',
+//       ),
+//     ];
+
+//     final bar = BottomNavigationBar(
+//       items: items,
+//       backgroundColor: const Color.fromARGB(255, 117, 192, 151),
+//       selectedItemColor: Colors.black,
+//       unselectedItemColor: const Color.fromARGB(255, 189, 186, 186),
+//       currentIndex: index,
+//       onTap: (index) {
+//         // Change index
+//         ref.read(indexProvider.notifier).state = index;
+//       },
+//     );
+
+//     const pages = [
+//       PageA(),
+//       PageB(),
+//       PageC(),
+//       PageD(),
+//       PageE(),
+//     ];
+
+//     // Drawer
+//     const drawer = Drawer(
+//       child: SideMenu(),
+//     );
+
+//     return Scaffold(
+//       drawer: drawer,
+//       body: pages[index],
+//       bottomNavigationBar: bar,
+//     );
+//   }
+// }

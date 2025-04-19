@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/pages/page_auth.dart';
 
-class SideMenu extends StatelessWidget {
+// State providers
+// Authentication state
+final isAuthenticatedProvider = StateProvider<bool>((ref) => false);
+
+
+class SideMenu extends ConsumerWidget {
   const SideMenu({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView(
       children: [
         DrawerHeader(
@@ -38,6 +45,22 @@ class SideMenu extends StatelessWidget {
           title: const Text('About'),
           onTap: () {
             debugPrint('About');
+          },
+        ),
+        ListTile(
+          title: const Text('LogOut'),
+          onTap: () {
+            // Unauthenticate and send to the AuthPage.
+            ref.read(isAuthenticatedProvider.notifier).state = false;
+            debugPrint('Logging out...');
+            if (context.mounted) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AuthPage(),  // App main page
+                ),
+              );
+            }
           },
         ),
       ],
