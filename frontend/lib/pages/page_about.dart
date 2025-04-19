@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/widgets/widget_home_btn.dart';
 import 'package:frontend/widgets/widget_side_menu.dart';
 
-class PageCameraCalibration extends StatelessWidget {
-  const PageCameraCalibration({super.key});
+class PageAbout extends StatelessWidget {
+  const PageAbout({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class PageCameraCalibration extends StatelessWidget {
 
     // Bar to show the current page
     final appBar = AppBar(
-      title: const Text('Camera Calibration'),
+      title: const Text('About'),
       backgroundColor: Color.fromARGB(255, 117, 192, 151),
     );
 

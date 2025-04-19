@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/pages/page_auth.dart';
+import 'package:go_router/go_router.dart';
 
 // State providers
 // Authentication state
 final isAuthenticatedProvider = StateProvider<bool>((ref) => false);
-
 
 class SideMenu extends ConsumerWidget {
   const SideMenu({super.key});
@@ -26,41 +25,38 @@ class SideMenu extends ConsumerWidget {
         ListTile(
           title: const Text('Climber'),
           onTap: () {
-            debugPrint('Climber');
+            context.go('/climber');
           },
         ),
         ListTile(
           title: const Text('Camera Calibration'),
           onTap: () {
+            context.go('/cam_calibration');
             debugPrint('Camera Calibration');
           },
         ),
         ListTile(
           title: const Text('Settings'),
           onTap: () {
+            context.go('/settings');
             debugPrint('Settings');
           },
         ),
         ListTile(
           title: const Text('About'),
           onTap: () {
+            context.go('/about');
             debugPrint('About');
           },
         ),
         ListTile(
+          // Log Out
           title: const Text('LogOut'),
           onTap: () {
             // Unauthenticate and send to the AuthPage.
             ref.read(isAuthenticatedProvider.notifier).state = false;
             debugPrint('Logging out...');
-            if (context.mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const AuthPage(),  // App main page
-                ),
-              );
-            }
+            context.go('/auth');
           },
         ),
       ],

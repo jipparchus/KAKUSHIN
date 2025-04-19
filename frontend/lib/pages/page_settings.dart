@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widgets/widget_home_btn.dart';
 import 'package:frontend/widgets/widget_side_menu.dart';
 
 class PageSettings extends StatelessWidget {
@@ -19,7 +20,27 @@ class PageSettings extends StatelessWidget {
 
     return Scaffold(
       appBar: appBar,
-      drawer: drawer
+      drawer: drawer,
+      body:
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('About'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                HomeBtn(),
+              ],
+            )
+          ],
+        )
     );
   }
 }

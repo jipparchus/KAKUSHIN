@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/pages/page_auth.dart';
+import 'package:frontend/routes/router.dart';
 
-// Provider
-// // Page index
-// final indexProvider = StateProvider((ref) {
-//   return 0;
-// });
 // AuthN state
 final isAuthenticatedProvider = StateProvider<bool>((ref) => false);
 
@@ -19,9 +14,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
-      home: const AuthPage(), // Always show AuthPage first
     );
   }
 }

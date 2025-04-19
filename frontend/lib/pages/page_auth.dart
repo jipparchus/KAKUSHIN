@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/pages/page_main.dart';
 import 'package:frontend/utils/utils_auth_request.dart';
+import 'package:go_router/go_router.dart';
 
 // State providers
 // Authentication state
@@ -43,14 +43,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         if (response == 200) { // Authenticated
           ref.read(isAuthenticatedProvider.notifier).state = true;
           ref.read(statusmessageProvider.notifier).state = '';
-          if (context.mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const MyApp(),  // App main page
-              ),
-            );
-          }
+          context.go('/main');
         } else if (response == 400) {
           ref.read(isAuthenticatedProvider.notifier).state = false;
           ref.read(statusmessageProvider.notifier).state = '🙈 Username already exists';
@@ -59,12 +52,12 @@ class _AuthPageState extends ConsumerState<AuthPage> {
           ref.read(statusmessageProvider.notifier).state = '🙊 Invalid credentials';
         } else {
           ref.read(isAuthenticatedProvider.notifier).state = false;
-          ref.read(statusmessageProvider.notifier).state = '🐒 Invalid credentials';
+          ref.read(statusmessageProvider.notifier).state = '🐒 Status Code: $response';
         }
       } catch (e, st) {
-        debugPrint('🦥 Login error: $e');
+        debugPrint('🐒 Login error: $e');
           ref.read(isAuthenticatedProvider.notifier).state = false;
-        ref.read(statusmessageProvider.notifier).state = '🦥 Invalid credentials';
+        ref.read(statusmessageProvider.notifier).state = '🐒 Login error: $e';
       }
     }
   }

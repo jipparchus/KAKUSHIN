@@ -6,6 +6,7 @@ import 'package:frontend/pages/page_b.dart';
 import 'package:frontend/pages/page_c.dart';
 import 'package:frontend/pages/page_d.dart';
 import 'package:frontend/pages/page_e.dart';
+import 'package:frontend/widgets/widget_btm_nav_bar.dart';
 import 'package:frontend/widgets/widget_side_menu.dart';
 
 
@@ -15,49 +16,13 @@ final indexProvider = StateProvider((ref) {
 });
 
 // After Authenticated
-class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
+class PageMain extends ConsumerWidget {
+  const PageMain({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     // Index watched
     final index = ref.watch(indexProvider);
-    // Items
-    const items = [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.build),
-        label: 'Trim & Holding',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.crop),
-        label: 'Wall',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.polyline),
-        label: 'Key Points',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.view_in_ar),
-        label: '3D Animation',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.insights),
-        label: 'Analysis',
-      ),
-    ];
-
-    final bar = BottomNavigationBar(
-      items: items,
-      backgroundColor: const Color.fromARGB(255, 117, 192, 151),
-      selectedItemColor: Colors.black,
-      unselectedItemColor: const Color.fromARGB(255, 189, 186, 186),
-      currentIndex: index,
-      onTap: (index) {
-        // Change index
-        ref.read(indexProvider.notifier).state = index;
-      },
-    );
 
     const pages = [
       PageA(),
@@ -67,15 +32,12 @@ class MyApp extends ConsumerWidget {
       PageE(),
     ];
 
-    // Drawer
-    const drawer = Drawer(
-      child: SideMenu(),
-    );
-
     return Scaffold(
-      drawer: drawer,
+      drawer: Drawer(
+        child: SideMenu(),
+      ),
       body: pages[index],
-      bottomNavigationBar: bar,
+      bottomNavigationBar: BtmNavBar()
     );
   }
 }
