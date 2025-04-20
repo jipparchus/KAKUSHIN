@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/pages/page_markdown.dart';
 import 'package:frontend/widgets/widget_home_btn.dart';
 import 'package:frontend/widgets/widget_side_menu.dart';
 
@@ -29,10 +30,31 @@ class PageAbout extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('About'),
+                Text(
+                  'Please have a look at my core ideas by clicking the button below.'
+                  ),
               ],
             ),
             const SizedBox(height: 16),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MarkdownWidget(
+                          assetPath: 'assets/markdown/my_ideas.md',
+                          title: 'My Ideas',
+                        )
+                      )
+                    );
+                  },
+                  child: const Text('My Ideas'),
+                ),
+              ],
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

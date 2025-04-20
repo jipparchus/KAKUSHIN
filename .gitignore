@@ -29,6 +29,7 @@ backend/.mypy_cache/
 # ========================
 # FLUTTER (frontend/)
 # ========================
+frontend/assets/
 frontend/.dart_tool/
 frontend/.packages
 frontend/.flutter-plugins

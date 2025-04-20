@@ -87,7 +87,7 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
       'height': height,
       'weight': weight,
       'share_info': _shareInfo,
-    };
+    }; 
 
     final response = await http.put(
       Uri.parse('http://127.0.0.1:8000/user/profile'),

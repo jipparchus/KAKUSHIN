@@ -29,7 +29,7 @@ class PageSettings extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('About'),
+                Text('Coming soon ...'),
               ],
             ),
             const SizedBox(height: 16),
