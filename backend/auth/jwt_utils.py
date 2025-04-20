@@ -1,17 +1,16 @@
-"""
+'''
 Module related to JWT access token
 
-1. Create token
-2. Validate token
-"""
+1. Create token for authenticated user
+2. Decode the token, validate, fetch the user, return the user
+'''
 
-# import jwt
-from jose import jwt
+from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from config import config
 
 SECRET_KEY = config['secret']['jwt_key']
-ALGORITHM = "HS256"
+ALGORITHM = 'HS256'
 EXPIRY_MINUTES = 30
 
 # Generate token
@@ -19,15 +18,15 @@ EXPIRY_MINUTES = 30
 
 def create_token(data: dict):
     data_copy = data.copy()
-    data_copy["user_id"] = str(data_copy["user_id"])
-    data_copy["exp"] = datetime.utcnow() + timedelta(minutes=EXPIRY_MINUTES)
+    data_copy['user_id'] = str(data_copy['user_id'])
+    data_copy['exp'] = datetime.utcnow() + timedelta(minutes=EXPIRY_MINUTES)
     return jwt.encode(data_copy, SECRET_KEY, algorithm=ALGORITHM)
 
 # Decode and validate token
 
 
-def decode_token(token: str):
+def decode_token(token: str) -> dict | None:
     try:
         return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except jwt.ExpiredSignatureError:
+    except JWTError:
         return None

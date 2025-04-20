@@ -22,8 +22,11 @@ def register(data: AuthData):
         raise HTTPException(status_code=400, detail='Username exists')
     user = User(username=data.username, hashed_password=hashed_pw)
     rdb.add(user)
+    print('######################################')
+    print(user.id)
     rdb.commit()
-    return {'status': 'registered'}
+    token = create_token({'user_id': user.id})
+    return {'access_token': token}
 
 
 @router.post('/login')
@@ -36,4 +39,4 @@ def login(data: AuthData):
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail='Invalid credentials')
     token = create_token({'user_id': user.id})
-    return {'token': token}
+    return {'access_token': token}

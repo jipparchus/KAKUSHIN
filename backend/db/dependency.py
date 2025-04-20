@@ -14,8 +14,8 @@ from db.session import SessionLocal
 
 
 def get_db():
-    db = SessionLocal()     # Create DB session
+    db = SessionLocal()
     try:
-        yield db            # Provide it to the route
+        yield db
     finally:
-        db.close()
+        db.close()  # Clean up

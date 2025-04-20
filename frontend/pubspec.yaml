@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   # validators:
+  shared_preferences:
   percent_indicator:
   file_picker:
   video_player:

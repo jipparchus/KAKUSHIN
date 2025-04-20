@@ -16,5 +16,5 @@ Future auth(String authtype, String username, String password) async {
       'password': password,
     }),
   );
-  return response.statusCode;
+  return response;
 }

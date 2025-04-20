@@ -10,6 +10,7 @@ Used for...
 
 
 from pydantic import BaseModel
+from typing import Optional
 
 
 class AuthData(BaseModel):
@@ -25,3 +26,13 @@ class RegisterUser(BaseModel):
 class CreateClimb(BaseModel):
     user_id: int
     name: str
+
+
+class UserProfile(BaseModel):
+    v_grade: Optional[int]  # int or nan
+    height: Optional[float]  # float or nan
+    weight: Optional[float]  # float or nan
+    share_info: bool
+
+    class Config:
+        orm_mode = True

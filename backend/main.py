@@ -11,7 +11,9 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 """
 
 from fastapi import FastAPI
-from routes import auth_routes, upload_routes
+from routes import upload
+from routes import auth
+from routes import user_info
 
 import os
 from config import config
@@ -34,5 +36,6 @@ Start API
 app = FastAPI()
 # Authentication: Who are you?
 # Authorization: What can you do? - JWT can carry role as well.
-app.include_router(auth_routes.router, prefix="/auth")
-app.include_router(upload_routes.router)
+app.include_router(auth.router, prefix="/auth")
+app.include_router(user_info.router, prefix="/user")
+app.include_router(upload.router)

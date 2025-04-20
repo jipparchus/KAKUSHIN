@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/utils/utils_auth_request.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // State providers
 // Authentication state
@@ -33,29 +36,35 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   }
 
   Future<void> _onAuthRequest(String authtype) async {
-    
     if (_formKey.currentState!.validate()) {
       final username = _usernameController.text.trim();
       final password = _passwordController.text;
 
       try {
         final response = await auth(authtype, username, password);
-        if (response == 200) { // Authenticated
+        if (response.statusCode == 200) { // Authenticated
+          final responseData = jsonDecode(response.body);
+          // JWT from the server
+          final token = responseData["access_token"];
+          // Save the token
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString("jwt_token", token);
           ref.read(isAuthenticatedProvider.notifier).state = true;
           ref.read(statusmessageProvider.notifier).state = '';
           context.go('/main');
-        } else if (response == 400) {
+        } else if (response.statusCode == 400) {
           ref.read(isAuthenticatedProvider.notifier).state = false;
           ref.read(statusmessageProvider.notifier).state = '🙈 Username already exists';
-        } else if (response == 401) {
+        } else if (response.statusCode == 401) {
           ref.read(isAuthenticatedProvider.notifier).state = false;
           ref.read(statusmessageProvider.notifier).state = '🙊 Invalid credentials';
         } else {
           ref.read(isAuthenticatedProvider.notifier).state = false;
-          ref.read(statusmessageProvider.notifier).state = '🐒 Status Code: $response';
+          ref.read(statusmessageProvider.notifier).state = '🐒 Status Code: $response.statusCode';
         }
       } catch (e, st) {
         debugPrint('🐒 Login error: $e');
+        debugPrint('$st');
           ref.read(isAuthenticatedProvider.notifier).state = false;
         ref.read(statusmessageProvider.notifier).state = '🐒 Login error: $e';
       }
