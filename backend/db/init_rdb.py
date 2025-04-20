@@ -2,8 +2,6 @@
 Create a SQLite database based on /models.py
 """
 
-# from fastapi import FastAPI, HTTPException, Depends
-# from pydantic import BaseModel
 from sqlalchemy import create_engine
 
 from config import config

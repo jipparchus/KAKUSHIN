@@ -9,6 +9,11 @@ import 'package:frontend/widgets/widget_side_menu.dart';
 import 'package:http/http.dart' as http;
 
 
+// Status message
+final usernameProvider = StateProvider<String>((ref) => 'Username');
+final svrresponseProvider = StateProvider<String>((ref) => 'Server response');
+
+
 class PageClimber extends ConsumerStatefulWidget {
   const PageClimber({super.key});
 
@@ -19,7 +24,7 @@ class PageClimber extends ConsumerStatefulWidget {
 class _UserProfileFormState extends ConsumerState<PageClimber> {
   final _formKey = GlobalKey<FormState>();
 
-  int? _vGrade;
+  String? _vGrade;
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
   bool _shareInfo = false;
@@ -44,6 +49,8 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
     );
     if (response.statusCode == 200) {
       final user = UserProfile.fromJson(jsonDecode(response.body));
+      // Show the username
+      ref.read(usernameProvider.notifier).state = jsonDecode(response.body)['username'];
       // Set the default values to the user input
       setState(() {
         _originalData = user;
@@ -53,6 +60,7 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
         _shareInfo = user.shareInfo;
       });
     } else {
+      ref.read(svrresponseProvider.notifier).state = '❌ Error: ${response.statusCode}';
       debugPrint("❌ Error: ${response.statusCode}");
     }
   }
@@ -75,7 +83,7 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
     final weight = double.tryParse(_weightController.text);
 
     final updateData = {
-      'v_grade': _vGrade,
+      'v_grade': _vGrade == 'NA' ? null : _vGrade,
       'height': height,
       'weight': weight,
       'share_info': _shareInfo,
@@ -85,15 +93,21 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
       Uri.parse('http://127.0.0.1:8000/user/profile'),
       headers: {
         'Authorization': 'Bearer $jwtToken',
+        'Content-Type': 'application/json',
       },
       body: jsonEncode(updateData),
     );
 
     if (response.statusCode == 200) {
-      debugPrint('✅ Updated');
+      ref.read(svrresponseProvider.notifier).state = '✅ Submitted\n${jsonEncode(updateData)}';
+      debugPrint('✅ Submitted');
       _fetchUserData(); // Refresh
     } else {
+      debugPrint('########################');
+      debugPrint(jsonEncode(updateData));
+      debugPrint('########################');
       debugPrint('❌ Failed: ${response.statusCode}');
+      ref.read(svrresponseProvider.notifier).state = '❌ Failed: ${response.statusCode}\n${jsonEncode(updateData)}';
     }
   }
 
@@ -123,19 +137,29 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 18),
+                  Text(ref.watch(usernameProvider),
+                  style: TextStyle(fontSize: 20),),
+                  const SizedBox(height: 18),                
+                ],
+              ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Text('Please entre your profile.'),
                 ],
               ),
               // V-Grade Dropdown
-              DropdownButtonFormField<int>(
+              DropdownButtonFormField<String>(
                 value: _vGrade,
-                decoration: const InputDecoration(labelText: 'V-Grade'),
+                decoration: const InputDecoration(labelText: 'Max Boulder Grade'),
                 items: [
-                  const DropdownMenuItem(value: null, child: Text('NA')),
+                  const DropdownMenuItem(value: 'NA', child: Text('NA')),
                   ...List.generate(
                     13,
                     (index) => DropdownMenuItem(
-                      value: index + 1,
+                      value: 'V${index + 1}',
                       child: Text("V${index + 1}"),
                     ),
                   )
@@ -187,8 +211,15 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
                   ),
                   ElevatedButton(
                     onPressed: _submit,
-                    child: const Text("Update"),
+                    child: const Text("Submit"),
                   ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(ref.watch(svrresponseProvider)),
                 ],
               ),
               const SizedBox(height: 16),

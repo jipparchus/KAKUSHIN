@@ -48,12 +48,8 @@ class User(Base):
         default=lambda: datetime.now(ZoneInfo('Asia/Tokyo')),
         onupdate=lambda: datetime.now(ZoneInfo('Asia/Tokyo')),
     )
-    first_climb: Mapped[date] = mapped_column(
-        Date,
-        nullable=True,
-    )
-    vgrade: Mapped[int] = mapped_column(
-        Integer,
+    v_grade: Mapped[str] = mapped_column(
+        Text,
         nullable=True,
     )
     height: Mapped[float] = mapped_column(

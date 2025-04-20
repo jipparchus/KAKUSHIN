@@ -29,10 +29,10 @@ class CreateClimb(BaseModel):
 
 
 class UserProfile(BaseModel):
-    v_grade: Optional[int]  # int or nan
+    v_grade: Optional[str]  # string or nan
     height: Optional[float]  # float or nan
     weight: Optional[float]  # float or nan
     share_info: bool
 
     class Config:
-        orm_mode = True
+        extra = "forbid"  # will error if unknown fields are sent

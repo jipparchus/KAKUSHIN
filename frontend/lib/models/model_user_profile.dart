@@ -1,5 +1,5 @@
 class UserProfile {
-  final int? vGrade;
+  final String? vGrade;
   final double? height;
   final double? weight;
   final bool shareInfo;
@@ -13,7 +13,7 @@ class UserProfile {
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
-      vGrade: json['v_grade'],
+      vGrade: json['v_grade'],    // Dart will automatically treat it as a nullable String?
       height: (json['height'] as num?)?.toDouble(),
       weight: (json['weight'] as num?)?.toDouble(),
       shareInfo: json['share_info'] ?? false,

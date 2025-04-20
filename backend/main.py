@@ -10,11 +10,13 @@ or:
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from routes import upload
 from routes import auth
 from routes import user_info
-
+import json
 import os
 from config import config
 import db.init_rdb as init_rdb
@@ -32,8 +34,24 @@ else:
 Start API
 """
 
+
 # Create FastAPI instance
 app = FastAPI()
+
+# https://qiita.com/kurumaebi65/items/74e2edf8a394cf086c9a
+
+
+@app.exception_handler(RequestValidationError)
+async def handler(request: Request, exc: RequestValidationError):
+    raw_body = await request.body()
+    data = json.loads(raw_body)
+    print('###############################################')
+    print('RAW BODY:\n', data)
+    print('EXC:\n', exc)
+    print('###############################################')
+    return JSONResponse(content={}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
 # Authentication: Who are you?
 # Authorization: What can you do? - JWT can carry role as well.
 app.include_router(auth.router, prefix="/auth")
