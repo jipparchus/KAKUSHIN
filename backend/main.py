@@ -56,4 +56,4 @@ async def handler(request: Request, exc: RequestValidationError):
 # Authorization: What can you do? - JWT can carry role as well.
 app.include_router(auth.router, prefix="/auth")
 app.include_router(user_info.router, prefix="/user")
-app.include_router(upload.router)
+app.include_router(upload.router, prefix="/upload")

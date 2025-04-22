@@ -5,3 +5,5 @@ python-multipart
 sqlalchemy
 python-jose[cryptography]
 passlib[bcrypt]
+numpy
+opencv-python

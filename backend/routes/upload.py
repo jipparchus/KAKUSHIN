@@ -13,8 +13,14 @@ import os
 from fastapi import APIRouter, File, UploadFile, Depends, HTTPException, Header
 from auth.jwt_utils import decode_token
 from fastapi.responses import JSONResponse
-
+from typing import List, Optional
 from config import config
+from db.dependency import get_db
+from auth.dependencies import get_current_user
+from db.session import SessionLocal
+from db.models import CameraMatrix
+from core.cam_calibration import get_camera_matrix
+from utils.img_tools import encode_images
 
 router = APIRouter()
 UPLOAD_DIR = config['paths']['assets']
@@ -32,25 +38,57 @@ def get_user_id(authorization: str = Header(...)):
 # When accessed to the root URL
 
 
-# @app.get("/")
-@router.get("/")
-def read_root():
-    return {"greeting": "Hello World from Python FastAPI!!!"}
+@router.post("/images")
+async def upload_images(
+    images: List[UploadFile] = File(...),
+    db: SessionLocal = Depends(get_db),
+    current_user=Depends(get_current_user),
+    mode: Optional[str] = Header(None),  # Get custom header 'mode'
+):
+    print('##########################')
+    print(f"📦 Upload mode: {mode}")
+    print('##########################')
+    imgs_bytes = [await img.read() for img in images]
+    status = '✅ upload: success'
+    if mode == 'cam_calibration':
+        result = get_camera_matrix(imgs_bytes)
+        if result is not None:
+            status += ' ✅ Calibration: success'
+            comment = result[0]
+            b64_images = encode_images(result[1])
+            new_cam = CameraMatrix(
+                user_id=current_user.id,
+                camera_matrix=result[0],
+            )
+            db.add(new_cam)
+            db.commit()  # generate an UPDATE SQL statement only for the fields that changed.
+            db.refresh(current_user)
+            response_content = {'status': status, 'comment': comment, 'images': b64_images}
+        else:
+            status += ' ❌ Calibration: fail'
+            comment = None
+            response_content = {'status': status, 'comment': comment}
+
+    return JSONResponse(
+        content=response_content,
+    )
 
 
-# @app.post("/upload")
-@router.post("/upload")
-async def upload_video(file: UploadFile = File(...), user_id: int = Depends(get_user_id)):
+@router.post("/video")
+async def upload_video(
+    video: UploadFile = File(...),
+    user_id: int = Depends(get_user_id)
+):
     folder = os.path.join(UPLOAD_DIR, str(user_id))
     os.makedirs(folder, exist_ok=True)
-    filepath = os.path.join(folder, file.filename)
+    filepath = os.path.join(folder, video.filename)
     # Read bytes
-    contents = await file.read()
+    contents = await video.read()
 
     with open(filepath, "wb") as f:
         f.write(contents)
 
-    return JSONResponse({"status": "success", "filename": file.filename})
+    return JSONResponse({"status": "success", "filename": video.filename})
 
 
 # @app.post("/create-climb")

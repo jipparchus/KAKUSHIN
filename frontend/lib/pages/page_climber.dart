@@ -9,7 +9,7 @@ import 'package:frontend/widgets/widget_side_menu.dart';
 import 'package:http/http.dart' as http;
 
 
-// Status message
+// Monitoring variables
 final usernameProvider = StateProvider<String>((ref) => 'Username');
 final svrresponseProvider = StateProvider<String>((ref) => 'Server response');
 
@@ -60,8 +60,9 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
         _shareInfo = user.shareInfo;
       });
     } else {
-      ref.read(svrresponseProvider.notifier).state = '❌ Error: ${response.statusCode}';
-      debugPrint("❌ Error: ${response.statusCode}");
+      final message = '❌ Error: ${response.statusCode}';
+      debugPrint(message);
+      ref.read(svrresponseProvider.notifier).state = message;
     }
   }
 
@@ -99,15 +100,17 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
     );
 
     if (response.statusCode == 200) {
-      ref.read(svrresponseProvider.notifier).state = '✅ Submitted\n${jsonEncode(updateData)}';
-      debugPrint('✅ Submitted');
+      final message = '✅ Submitted';
+      debugPrint(message);
+      ref.read(svrresponseProvider.notifier).state = message;
       _fetchUserData(); // Refresh
     } else {
       debugPrint('########################');
       debugPrint(jsonEncode(updateData));
       debugPrint('########################');
-      debugPrint('❌ Failed: ${response.statusCode}');
-      ref.read(svrresponseProvider.notifier).state = '❌ Failed: ${response.statusCode}\n${jsonEncode(updateData)}';
+      final message = '❌ Failed: ${response.statusCode}';
+      debugPrint(message);
+      ref.read(svrresponseProvider.notifier).state = '${message}\n${jsonEncode(updateData)}';
     }
   }
 

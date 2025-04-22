@@ -42,6 +42,8 @@ dependencies:
   flutter_riverpod:
   flutter_markdown:
   url_launcher:
+  carousel_slider:
+  archive:
   flutter:
     sdk: flutter
 

@@ -18,6 +18,8 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .env
+backend/core
+backend/utils
 backend/config.yaml
 # Virtual environment
 backend/venv/
@@ -77,5 +79,6 @@ frontend/web
 # DATABASE (database/)
 # ========================
 database/*.db
+database/assets/
 database/uploads/
 database/secrets/

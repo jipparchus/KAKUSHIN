@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/utils/upload_progress_stream.dart';
+import 'package:frontend/utils/utils_get_jwt.dart';
 import 'package:frontend/widgets/widget_ipinput.dart';
 import 'package:frontend/widgets/widget_side_menu.dart';
 import 'package:frontend/widgets/widget_video_player.dart';
@@ -30,6 +31,8 @@ class _PageAState extends State<PageA> {
 Future<void> _onSendVideo() async {
   if (_selectedVideo == null) return;
 
+  final jwtToken = await getJWT(); // Get token from shared_preferences
+
   setState(() {
     _uploadProgress = 0.0;
     _videoInfo = '📨 Uploading...\nPlease wait.';
@@ -37,8 +40,9 @@ Future<void> _onSendVideo() async {
 
   final request = http.MultipartRequest(
     'POST',
-    Uri.parse('http://127.0.0.1:8000/upload'),
+    Uri.parse('http://127.0.0.1:8000/upload/video'),
   );
+  request.headers['Authorization'] = 'Bearer $jwtToken';
 
   final file = _selectedVideo!;
   final fileLength = await _selectedVideo!.length();
@@ -54,7 +58,7 @@ Future<void> _onSendVideo() async {
 
   request.files.add(
     http.MultipartFile(
-      'file',
+      'video',
       http.ByteStream(stream), // wrap it here
       fileLength,
       filename: basename(file.path),
@@ -122,9 +126,9 @@ Future<void> _onSendVideo() async {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _selectedVideo != null
-                    ? Padding(
-                        padding: const EdgeInsets.all(5.0),
+                  if (_selectedVideo != null)
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
                         child: Align(
                             alignment: Alignment.topCenter,
                             child: SizedBox(
@@ -134,7 +138,8 @@ Future<void> _onSendVideo() async {
                               ),
                           ),
                         )
-                    : const ColoredBox(
+                    else 
+                      const ColoredBox(
                         color: Colors.grey,
                         child: SizedBox(
                                 width: 250,
