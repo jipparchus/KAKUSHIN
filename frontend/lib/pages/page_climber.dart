@@ -110,7 +110,7 @@ class _UserProfileFormState extends ConsumerState<PageClimber> {
       debugPrint('########################');
       final message = '❌ Failed: ${response.statusCode}';
       debugPrint(message);
-      ref.read(svrresponseProvider.notifier).state = '${message}\n${jsonEncode(updateData)}';
+      ref.read(svrresponseProvider.notifier).state = '$message\n${jsonEncode(updateData)}';
     }
   }
 

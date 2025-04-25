@@ -26,7 +26,7 @@ class _PageCameraCalibrationState extends State<PageCameraCalibration> {
   String _submissionInfo = 'Select the calibration images and submit them';
   String _calibrationInfo = '';
 
-  List<File> _selectedImages = [];
+  final List<File> _selectedImages = [];
 
   void _addImages(List<File> newImages) {
     setState(() {

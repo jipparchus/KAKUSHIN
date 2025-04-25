@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// Page index
-final indexProvider = StateProvider((ref) {
-  return 0;
-});
+import 'package:frontend/providers/nav_provider.dart';
+
+// // Page index
+// final indexProvider = StateProvider((ref) {
+//   return 0;
+// });
 
 
 class BtmNavBar extends ConsumerWidget {
@@ -12,13 +14,13 @@ class BtmNavBar extends ConsumerWidget {
 @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Index watched
-    final index = ref.watch(indexProvider);
+    // final index = ref.watch(indexProvider);
     
     return BottomNavigationBar(
   items: [
     BottomNavigationBarItem(
-      icon: Icon(Icons.build),
-      label: 'Trim & Holding',
+      icon: Icon(Icons.file_upload),
+      label: 'Upload',
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.crop),
@@ -40,10 +42,10 @@ class BtmNavBar extends ConsumerWidget {
   backgroundColor: const Color.fromARGB(255, 117, 192, 151),
   selectedItemColor: Colors.black,
   unselectedItemColor: const Color.fromARGB(255, 189, 186, 186),
-  currentIndex: index,
-  onTap: (index) {
+  currentIndex: ref.watch(indexProvider),
+  onTap: (idx) {
     // Change index
-    ref.read(indexProvider.notifier).state = index;
+    ref.read(indexProvider.notifier).state = idx;
   },
   );
   }

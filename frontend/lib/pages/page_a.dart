@@ -89,7 +89,7 @@ Future<void> _onSendVideo() async {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('3D Animation'),
+          title: const Text('Video Upload'),
           backgroundColor: Color.fromARGB(255, 117, 192, 151),
           ),
         drawer: Drawer(
@@ -100,7 +100,7 @@ Future<void> _onSendVideo() async {
           child: Column(
             children: [
               Text(
-                'Original/Trimmed Video',
+                'Original Video',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

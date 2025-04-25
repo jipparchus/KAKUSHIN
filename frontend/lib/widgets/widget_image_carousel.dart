@@ -26,7 +26,7 @@ class CarouselWidget extends StatelessWidget {
           ),
           ElevatedButton(
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.redAccent)
+              backgroundColor: WidgetStateProperty.all(Colors.redAccent)
             ),
             onPressed: () {
               onRemoveImage(index);
