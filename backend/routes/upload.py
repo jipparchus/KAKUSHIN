@@ -1,14 +1,3 @@
-"""
-Forward the port 8000 from the Android device to the host machine.
-Check the device ID with:
-adb devices
-Then:
-adb -s R52R902GW2J reverse tcp:8000 tcp:8000
-To start the server, run:
-uvicorn main:app --host localhost --port 8000
-or:
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-"""
 import os
 from fastapi import APIRouter, File, UploadFile, Depends, HTTPException, Header
 from auth.jwt_utils import decode_token
@@ -19,7 +8,9 @@ from db.dependency import get_db
 from auth.dependencies import get_current_user
 from db.session import SessionLocal
 from db.models import CameraMatrix
-from core.cam_calibration import get_camera_matrix
+from core.modules.cam_utils import get_camera_matrix
+from core.modules.data_objects import VideoData
+from core.modules.visual_odometry import rgbd_vo
 from utils.img_tools import encode_images
 
 router = APIRouter()
@@ -88,7 +79,12 @@ async def upload_video(
     with open(filepath, "wb") as f:
         f.write(contents)
 
-    return JSONResponse({"status": "success", "filename": video.filename})
+    del video
+    video = VideoData(filepath)
+    # Do the core analyis
+    rgbd_vo(video)
+
+    return JSONResponse({"status": "success"})
 
 
 # @app.post("/create-climb")
