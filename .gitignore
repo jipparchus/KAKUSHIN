@@ -22,7 +22,7 @@ backend/core
 backend/utils
 backend/config.yaml
 # Virtual environment
-backend/venv/
+backend/env
 backend/.mypy_cache/
 
 # auth
