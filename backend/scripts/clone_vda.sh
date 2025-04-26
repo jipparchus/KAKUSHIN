@@ -1,11 +1,12 @@
 
-PYTHON_VERSION="python3.10"
-VENV_DIR="./env/venv_vda"
+# PYTHON_VERSION="python3.10"
+VENV_DIR="../env/venv_vda"
 
 # Check if the virtual environment exists
 if [ ! -d "$VENV_DIR" ]; then
     echo "Creating virtual environment ($VENV_DIR)..."
-    $PYTHON_VERSION -m venv "$VENV_DIR"
+    # $PYTHON_VERSION -m venv $VENV_DIR
+    python -m venv $VENV_DIR
 else
     echo "Virtual environment ($VENV_DIR) already exists."
 fi
@@ -30,7 +31,7 @@ cd Video-Depth-Anything
 
 pip install -r requirements.txt
 
-cd ../../..
+# cd ../../..
 
 # Deactivate the virtual environment once
 if [[ -n "$VIRTUAL_ENV" ]]; then

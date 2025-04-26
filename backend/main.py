@@ -1,4 +1,5 @@
 """
+[Windows (host)]
 Forward the port 8000 from the Android device to the host machine.
 Check the device ID with:
 adb devices
@@ -6,6 +7,11 @@ Then:
 adb -s R52R902GW2J reverse tcp:8000 tcp:8000
 adb -s 350467090639813 reverse tcp:8000 tcp:8000
 
+Start Docker
+docker-compose up
+(docker-compose up --build if updated Dockerfile, dockercompose, or .env)
+
+[Docker] (included in Dockerfile already)
 To start the server, run:
 uvicorn main:app --host localhost --port 8000
 or:
