@@ -9,3 +9,10 @@ numpy
 opencv-python
 ultralytics
 open3d
+
+# torch_geometric
+# mediapipe
+# scikit-learn
+# scikit-spatial
+# ipykernel
+# ipympl
