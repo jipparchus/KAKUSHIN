@@ -73,8 +73,9 @@ Future<void> _onSendVideo() async {
 
   if (response.statusCode == 200) {
     setState(() {
-      _videoInfo = '✅ Upload successful: \n${response.body}';
+      _videoInfo = '✅ Upload successful';
       _uploadProgress = 1.0;
+      
     });
   } else {
     setState(() {

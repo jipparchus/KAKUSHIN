@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter, File, UploadFile, Depends, HTTPException, Header
 from auth.jwt_utils import decode_token
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from typing import List, Optional
 from config import config
 from db.dependency import get_db
@@ -82,9 +82,10 @@ async def upload_video(
     del video
     video = VideoData(filepath)
     # Do the core analyis
-    rgbd_vo(video)
+    path_pointcloud = rgbd_vo(video)
 
-    return JSONResponse({"status": "success"})
+    # return JSONResponse({"status": "success"})
+    return FileResponse(path_pointcloud, media_type='application/octet-stream', filename=os.path.basename(path_pointcloud))
 
 
 # @app.post("/create-climb")
