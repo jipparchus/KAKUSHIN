@@ -249,13 +249,14 @@ class PointCloudData:
         # Convert the inverse depth to depth
         depth_metric = 1.0 / (depth_np + 1e-6)
 
-        # Point cloud creation
         color_o3d = o3d.geometry.Image(rgb_resized)
         depth_o3d = o3d.geometry.Image(depth_metric)
+        # RGBD image
         rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(
             color_o3d, depth_o3d,
             depth_scale=1.0, convert_rgb_to_intensity=False
         )
+        # Point cloud creation
         pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, self.intrinsic)
         if downsample_voxel_size is not None:
             pcd = pcd.voxel_down_sample(voxel_size=downsample_voxel_size)  # Downsampling
