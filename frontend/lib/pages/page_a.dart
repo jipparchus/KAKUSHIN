@@ -10,6 +10,7 @@ import 'package:frontend/widgets/widget_video_selector.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 
@@ -35,7 +36,7 @@ Future<void> _onSendVideo() async {
 
   setState(() {
     _uploadProgress = 0.0;
-    _videoInfo = '📨 Uploading...\nPlease wait.';
+    _videoInfo = '📨 Creating Point Cloud...\nPlease wait.';
   });
 
   final request = http.MultipartRequest(
@@ -72,10 +73,17 @@ Future<void> _onSendVideo() async {
   final response = await http.Response.fromStream(streamedResponse);
 
   if (response.statusCode == 200) {
+    final dir = await getApplicationDocumentsDirectory();
+    final plyPath = '${dir.path}/downloaded.ply';
+    final plyFile = File(plyPath);
+      // Save the returned .ply file
+    final bytes = await streamedResponse.stream.toBytes();
+    await plyFile.writeAsBytes(bytes);
+
     setState(() {
-      _videoInfo = '✅ Upload successful';
+      _videoInfo = '✅ Point Cloud saved at $plyFile';
       _uploadProgress = 1.0;
-      
+
     });
   } else {
     setState(() {
