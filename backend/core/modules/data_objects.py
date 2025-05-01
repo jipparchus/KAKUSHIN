@@ -432,7 +432,7 @@ class PointCloudData:
         n_pcds = len(pcds)
 
         # Get pairwise registrations
-        for source_id in range(n_pcds - 1):
+        for source_id in range(n_pcds):
             for target_id in range(source_id + 1, n_pcds):
                 result_icp, information_matrix = self.pairwise_registration(
                     pcds[source_id],

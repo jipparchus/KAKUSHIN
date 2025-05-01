@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frontend/utils/upload_progress_stream.dart';
 import 'package:frontend/utils/utils_get_jwt.dart';
-import 'package:frontend/widgets/widget_ipinput.dart';
+// import 'package:frontend/widgets/widget_ipinput.dart';
 import 'package:frontend/widgets/widget_side_menu.dart';
 import 'package:frontend/widgets/widget_video_player.dart';
 import 'package:frontend/widgets/widget_video_selector.dart';
@@ -126,10 +126,10 @@ Future<void> _onSendVideo() async {
                         });
                       },
                     ),
-                    SizedBox(
-                      width: 300,
-                      child: IpInputWidget(onIpChanged: (ip) => ipAddress = ip),
-                    )
+                    // SizedBox(
+                    //   width: 300,
+                    //   child: IpInputWidget(onIpChanged: (ip) => ipAddress = ip),
+                    // )
                   ],
               ),
               Row(
