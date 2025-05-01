@@ -228,14 +228,13 @@ class PointCloudData:
             fx=self.camera.fx * scale_x, fy=self.camera.fy * scale_y,
             cx=self.camera.cx * scale_x, cy=self.camera.cy * scale_y)
 
-    def rgbd_to_pointcloud(self, frame_num: int, **kwargs):
+    def get_rgbd(self, frame_num: int):
         """
+        Create RGB-D frames from rgb frames and depth array
         Parameters:
             frame_num: Frame number
-            kwargs: downsample_voxel_size: float
         """
-        print('RGBD to point cloud')
-        downsample_voxel_size = kwargs.pop('downsample_voxel_size', None)
+        print('RGBD frames')
         # Obtain point cloud from a single image and corresponding depth array
         rgb_frame = cv2.cvtColor(self.video.load_frame(frame_num), cv2.COLOR_BGR2RGB)
         depth_np = self.depths[frame_num].astype(np.float32)
@@ -248,7 +247,8 @@ class PointCloudData:
 
         # Convert the inverse depth to depth
         depth_metric = 1.0 / (depth_np + 1e-6)
-
+        print(f'depth_metric max: {np.max(depth_metric)}')
+        print(f'depth_metric min: {np.min(depth_metric)}')
         color_o3d = o3d.geometry.Image(rgb_resized)
         depth_o3d = o3d.geometry.Image(depth_metric)
         # RGBD image
@@ -256,13 +256,21 @@ class PointCloudData:
             color_o3d, depth_o3d,
             depth_scale=1.0, convert_rgb_to_intensity=False
         )
+        return rgbd
+
+    def rgbd_to_pointcloud(self, frame_num: int, **kwargs):
+        """
+        Parameters:
+            frame_num: Frame number
+            kwargs: downsample_voxel_size: float
+        """
+        rgbd = self.get_rgbd(frame_num)
+        downsample_voxel_size = kwargs.pop('downsample_voxel_size', None)
+        print('RGBD to point cloud')
         # Point cloud creation
         pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, self.intrinsic)
         if downsample_voxel_size is not None:
             pcd = pcd.voxel_down_sample(voxel_size=downsample_voxel_size)  # Downsampling
-        print(f'depth_metric max: {np.max(depth_metric)}')
-        print(f'depth_metric min: {np.min(depth_metric)}')
-        print(f"downsample_voxel_size: {downsample_voxel_size}")
         print(f'#points: {len(pcd.points)}')
 
         return pcd
@@ -424,7 +432,7 @@ class PointCloudData:
         n_pcds = len(pcds)
 
         # Get pairwise registrations
-        for source_id in range(n_pcds - 1):
+        for source_id in range(n_pcds):
             for target_id in range(source_id + 1, n_pcds):
                 result_icp, information_matrix = self.pairwise_registration(
                     pcds[source_id],
