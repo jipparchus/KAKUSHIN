@@ -14,6 +14,7 @@ ipympl
 ipykernel
 pytest
 pytest-cov
+httpx
 
 # torch_geometric
 # scikit-learn
