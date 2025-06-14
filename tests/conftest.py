@@ -1,11 +1,13 @@
 import pytest
 import os
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-from backend.main import app
+# from backend.main import app
+from backend.routes import auth
 from backend.db.session import get_db
 from backend.db.models import Base
 
@@ -27,6 +29,11 @@ TestingSessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=Fals
 
 # Create the DB schema
 Base.metadata.create_all(bind=engine)
+
+
+# Create FastAPI instance
+app = FastAPI()
+app.include_router(auth.router, prefix="/auth")
 
 
 """
