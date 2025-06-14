@@ -1,0 +1,24 @@
+app:
+  name: Kakushin
+  version: 0.0.1
+
+secret:
+  jwt_key: "REPLACE_ME"
+
+database:
+  path: "../database/"
+  name: "data.db"
+  uri: "sqlite:///../database/test_data.db"
+  
+paths:
+  backend: "../backend"
+  models: "../backend/core/models"
+  database: "../database/data.db"
+  assets: "../database/assets"
+  # trim: "../database/assets/trim"
+  # contact: "../database/assets/contact"
+  # wall_mask: "../database/assets/wall_mask"
+  # wall_kp: "../database/assets/wall_kp"
+  # camera: "../database/assets/camera"
+  # core: "../database/assets/core"
+  # wall_dimensions: "../database/assets/wall_dimensions.pkl"
