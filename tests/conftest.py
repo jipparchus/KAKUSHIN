@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from pathlib import Path
 
-# Add the parent dir to sys.path (assumes /tests is inside project root)
+# Add the parent dir to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from backend.main import app
