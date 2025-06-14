@@ -1,8 +1,14 @@
 import pytest
 import os
+import sys
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from pathlib import Path
+
+# Add the parent dir to sys.path (assumes /tests is inside project root)
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from backend.main import app
 from backend.db.session import get_db
