@@ -21,11 +21,11 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from backemd.routes import upload
-from backemd.routes import auth
-from backemd.routes import user_info
+from routes import upload
+from routes import auth
+from routes import user_info
 import json
-import backemd.db.init_rdb as init_rdb
+import db.init_rdb as init_rdb
 
 
 """
