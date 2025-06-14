@@ -27,4 +27,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          PYTHONPATH=. pytest tests/ --disable-warnings --maxfail=1
+          PYTHONPATH=backend pytest tests/ --disable-warnings --maxfail=1
