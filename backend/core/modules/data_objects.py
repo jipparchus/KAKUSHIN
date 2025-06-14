@@ -1,5 +1,6 @@
 import os
 import gc
+import pickle
 import random
 from dataclasses import dataclass
 import cv2
@@ -7,6 +8,7 @@ import open3d as o3d
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
+import mediapipe as mp
 
 
 from core.modules.video_utils import standardize_fsize
@@ -110,6 +112,10 @@ class VideoData:
             else:
                 yield frame
 
+    def get_human_pose(self):
+        human_pose = HumanPose(video=self)
+        coords3d, coords2d, coords3d_confidence, coords2d_confidence = human_pose.get_3dpose(save=True, get_2dpose=True)
+
     def get_point_cloud(self):
 
         cam = {
@@ -207,6 +213,104 @@ class VideoData:
             self.release()
         except:
             pass
+
+
+@dataclass
+class HumanPose:
+    video: VideoData
+
+    def __post_init__(self):
+        self.pose_video = self.video.path.replace('.mp4', '_humanpose.mp4')
+        self.direc_saveas_3d = self.video.path.replace('.mp4', '_3dpose.pkl')
+        self.direc_saveas_3d_cnf = self.video.path.replace('.mp4', '_3dpose_confidence.pkl')
+        self.direc_saveas_2d = self.video.path.replace('.mp4', '_2dpose.pkl')
+        self.direc_saveas_2d_cnf = self.video.path.replace('.mp4', '_2dpose_confidence.pkl')
+
+        self.mp_drawing = mp.solutions.drawing_utils
+        self.mp_holistic = mp.solutions.holistic
+        self.drawing_styles = mp.solutions.drawing_styles
+        print('HumanPose initialised')
+
+    def get_3dpose(self, save=True, get_2dpose=True):
+
+        def adaptive_thld(img):
+            (r, g, b) = cv2.split(img)
+            r = cv2.adaptiveThreshold(r, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 13, 20)
+            g = cv2.adaptiveThreshold(g, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 13, 20)
+            b = cv2.adaptiveThreshold(b, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 13, 20)
+            return cv2.merge((r, g, b))
+
+        if save:
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            out = cv2.VideoWriter(self.pose_video, fourcc, 30.0, (int(self.video.vcap.get(3)), int(self.video.vcap.get(4))))
+
+        coords3d = []
+        coords2d = []
+        coords3d_confidence = []
+        coords2d_confidence = []
+
+        with self.mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=0.4) as holistic:
+            for frame in self.video.iter_frames_streaming():
+                # while self.video.vcap.isOpened():
+                #     ret, frame = self.video.vcap.read()
+                try:
+                    nx, ny, nz = frame.shape
+
+                    def coords_conversion(array):
+                        return tuple(np.multiply(array, [ny, nx]).astype(int))
+                    # BGR to RGB
+                    img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    img2show = cv2.addWeighted(src1=img, alpha=0.9, src2=adaptive_thld(img), beta=0.1, gamma=0)
+                    # Detection
+                    results = holistic.process(img2show)
+
+                    landmarks_3d = [results.pose_world_landmarks.landmark[lm] for lm in mp.solutions.pose.PoseLandmark]
+                    coords3d.append(np.array([(lm.x, lm.y, lm.z) for lm in landmarks_3d]))
+                    coords3d_confidence.append(np.array([lm.visibility for lm in landmarks_3d]))
+
+                    if get_2dpose:
+                        landmarks_2d = [results.pose_landmarks.landmark[lm] for lm in mp.solutions.pose.PoseLandmark]
+                        coords2d.append(np.array([(lm.x, lm.y) for lm in landmarks_2d]))
+                        coords2d_confidence.append(np.array([lm.visibility for lm in landmarks_2d]))
+
+                    if save:
+                        self.mp_drawing.draw_landmarks(img2show, results.pose_landmarks, self.mp_holistic.POSE_CONNECTIONS,
+                                                       self.mp_drawing.DrawingSpec(color=(255, 0, 0), thickness=2, circle_radius=1),
+                                                       self.mp_drawing.DrawingSpec(color=(255, 0, 0), thickness=2, circle_radius=3))
+                        self.mp_drawing.draw_landmarks(img2show, results.left_hand_landmarks, self.mp_holistic.HAND_CONNECTIONS,
+                                                       self.mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=0),
+                                                       self.mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=1))
+                        self.mp_drawing.draw_landmarks(img2show, results.right_hand_landmarks, self.mp_holistic.HAND_CONNECTIONS,
+                                                       self.mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=0),
+                                                       self.mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=1))
+                        img2show = cv2.cvtColor(img2show, cv2.COLOR_RGB2BGR)
+                        out.write(img2show)
+
+                except AttributeError:
+                    break
+
+            coords3d, coords2d = np.array(coords3d), np.array(coords2d)
+
+            self.video.vcap.release()
+            if save:
+                out.release()
+            cv2.destroyAllWindows()
+
+        if save:
+            with open(self.direc_saveas_3d, 'wb') as f:
+                pickle.dump(coords3d, f)
+
+            with open(self.direc_saveas_3d_cnf, 'wb') as f:
+                pickle.dump(coords3d_confidence, f)
+
+            if get_2dpose:
+                with open(self.direc_saveas_2d, 'wb') as f:
+                    pickle.dump(coords2d, f)
+
+                with open(self.direc_saveas_2d_cnf, 'wb') as f:
+                    pickle.dump(coords2d_confidence, f)
+
+        return coords3d, coords2d, coords3d_confidence, coords2d_confidence
 
 
 @dataclass
@@ -480,3 +584,40 @@ class PointCloudData:
         # pcd_combined_down = pcd_combined.voxel_down_sample(voxel_size=voxel_size)
         # return pcd_combined_down
         return pcd_combined
+
+
+# class Body:
+#     def __init__(self, frame_number):
+#         self.t = frame_number
+#         self.mass = get_mass_all()
+#         self.coords3d, self.coords2d = clean_coord(coords3d, coords2d)
+#         self.coords3d_conf, self.coords2d_conf = coords3d_confidence, coords2d_confidence
+#         # self.coords3d, self.coords2d = coords3d, coords2d
+#         self.dict_com3d = get_com_part_simple(self.coords3d[self.t])
+#         self.dict_com2d = get_com_part_simple(self.coords2d[self.t])
+#         self.contact_points3d = ContactPoints(self.coords3d, self.t)
+#         self.contact_points2d = ContactPoints(self.coords2d, self.t)
+#         self.edges3d = get_edge_coords_all(self.coords3d[self.t])
+#         self.edges2d = get_edge_coords_all(self.coords2d[self.t])
+#         self.edges_col = get_edge_col_all()
+
+#     def plot(self, ax):
+#         for coords, col in zip(self.edges3d.values(), self.edges_col.values()):
+#             p0, p1 = coords
+#             xs, ys, zs = [p0[0], p1[0]], [p0[1], p1[1]], [p0[2], p1[2]]
+#             ax.plot(xs, ys, zs, c=col)
+
+#         for point in self.contact_points3d.dict_points.values():
+#             col = 'white'
+#             if point['state'] == 1:
+#                 col = 'orange'
+#             x, y, z = point['coords']
+#             ax.scatter(x, y, z, marker='o', c=col, edgecolors='k', s=30)
+
+#         for key, val in self.dict_com3d.items():
+#             x, y, z = val
+#             ax.scatter(x, y, z, marker='o', c='green', edgecolors='k', s=50)
+#         ax.set_xlabel("x")
+#         ax.set_ylabel("y")
+#         ax.set_zlabel("z")
+#         return ax
