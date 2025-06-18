@@ -6,22 +6,23 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-# from backend.main import app
 from backend.db.session import get_db
 from backend.db.models import Base
 
 # from test_config import test_config
 
-# """
-# Mocks
-# """
+
+# Create FastAPI instance
+app = FastAPI()
+# app.include_router(auth.router, prefix="/auth")
+app.include_router(APIRouter(), prefix="/auth")
+
 # @pytest.fixture(autouse=True)
 # def mock_auth(mocker):
 #     mock = mocker.patch('backend.routes.auth.get')
 
 # Test DB configuration — SQLite in-memory
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
-
 # Create engine and session
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
@@ -40,12 +41,6 @@ def db():
     finally:
         db.close()
         Base.metadata.drop_all(bind=engine)
-
-
-# Create FastAPI instance
-app = FastAPI()
-# app.include_router(auth.router, prefix="/auth")
-app.include_router(APIRouter(), prefix="/auth")
 
 
 @pytest.fixture(scope="function")
