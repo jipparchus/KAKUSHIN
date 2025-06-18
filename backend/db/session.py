@@ -21,3 +21,10 @@ from config import config
 
 engine = create_engine(config['database']['uri'], echo=True)
 SessionLocal = sessionmaker(bind=engine)
+
+# def get_db():
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()  # Clean up

@@ -1,12 +1,13 @@
 import pytest
 import os
+import yaml
 from fastapi import FastAPI, APIRouter
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-from backend.db.session import get_db
+from backend.db.dependency import get_db
 from backend.db.models import Base
 
 # from test_config import test_config
@@ -17,9 +18,19 @@ app = FastAPI()
 # app.include_router(auth.router, prefix="/auth")
 app.include_router(APIRouter(), prefix="/auth")
 
-# @pytest.fixture(autouse=True)
-# def mock_auth(mocker):
-#     mock = mocker.patch('backend.routes.auth.get')
+"""
+Mocks
+"""
+
+
+@pytest.fixture(autouse=True)
+def mock_auth(mocker):
+    mock = mocker.patch('config.config')
+    config_path = os.path.join(os.path.dirname(__file__), 'test_config.yaml')
+    with open(config_path, 'r') as f:
+        mock.return_value = yaml.safe_load(f)
+    return mock
+
 
 # Test DB configuration — SQLite in-memory
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
