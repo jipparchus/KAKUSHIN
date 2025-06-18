@@ -7,10 +7,10 @@ from sqlalchemy.orm import sessionmaker
 
 
 # from backend.main import app
-from backend.db.session import get_db
+from backend.db.dependency import get_db
 from backend.db.models import Base
 
-from test_config import test_config
+# from test_config import test_config
 
 # """
 # Mocks
@@ -19,22 +19,27 @@ from test_config import test_config
 # def mock_auth(mocker):
 #     mock = mocker.patch('backend.routes.auth.get')
 
+# Test DB configuration — SQLite in-memory
+SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 
-if os.path.exists(test_config['paths']['database']):
-    pass
-else:
-    # Create engine and session
-    engine = create_engine(
-        test_config['database']['uri'],
-        echo=True
-    )
-    Base.metadata.create_all(engine)
-
+# Create engine and session
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    echo=True
+)
 TestingSessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
-# Create the DB schema
-Base.metadata.create_all(bind=engine)
+# DB fixture: create/drop tables around each test
+@pytest.fixture(scope="function")
+def db():
+    Base.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
 
 
 # Create FastAPI instance
@@ -43,36 +48,19 @@ app = FastAPI()
 app.include_router(APIRouter(), prefix="/auth")
 
 
-"""
-Dependency override
-Replace the backend.dependency.get_db() with a test version that points to the test database.
-"""
-
-
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-# Apply override globally before running tests
-"""
-Telling FastAPI that whenever Depends(get_db) is called, it should use override_get_db instead.
-"""
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(scope="module")
-def setup_db():
-    Base.metadata.create_all(bind=engine)
-    yield Base.metadata.drop_all(bind=engine)
-
-# Pytest fixture for the client
-
-
-@pytest.fixture(scope="module")
-def client():
-    with TestClient(app) as c:
-        yield c
+@pytest.fixture(scope="function")
+def client(db):
+    def override_get_db():
+        """
+        Dependency override
+        Replace the backend.dependency.get_db() with a test version that points to the test database.
+        """
+        db = TestingSessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+    # Telling FastAPI that whenever Depends(get_db) is called, it should use override_get_db instead.
+    app.dependency_overrides[get_db] = override_get_db
+    yield TestClient(app)
+    app.dependency_overrides.clear()
