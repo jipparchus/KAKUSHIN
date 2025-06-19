@@ -22,9 +22,11 @@ from backend.config import load_config
 
 def get_engine():
     config = load_config()
-    return create_engine(config['database']['uri'], echo=True)
+    engine = create_engine(config['database']['uri'], echo=True)
+    return engine
 
 
 def get_session_local():
     engine = get_engine()
-    return sessionmaker(bind=engine)
+    SessionLocal = sessionmaker(bind=engine)
+    return SessionLocal()
