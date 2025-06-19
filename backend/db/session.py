@@ -17,7 +17,7 @@ rdb.close()
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from config import config
+from backend.config import config
 
 engine = create_engine(config['database']['uri'], echo=True)
 SessionLocal = sessionmaker(bind=engine)
