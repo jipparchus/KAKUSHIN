@@ -25,10 +25,20 @@ def pytest_configure():
     mock.patch("backend.config.load_config", mock_load_config).start()
 
     # Mock backend/auth/jwt_utils.py module
-    mock_jwt_utils = mock.Mock()
-    mock_jwt_utils.create_token.return_value = "mocked_token"
-    mock_jwt_utils.decode_token.return_value = {"user_id": "mocked-id"}
-    mock.patch("backend.auth.jwt_utils", mock_jwt_utils).start()
+    # mock_jwt_utils = mock.Mock()
+    # mock_jwt_utils.create_token.return_value = "mocked_token"
+    # mock_jwt_utils.decode_token.return_value = {"user_id": "mocked-id"}
+    mock.patch(
+        "backend.auth.jwt_utils.create_token",
+        return_value="mocked_token",
+    ).start()
+
+    mock.patch(
+        "backend.auth.jwt_utils.decode_token",
+        return_value={"user_id": "mocked-id"},
+    ).start()
+
+
 
     from backend.main import app
 
