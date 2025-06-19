@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from auth.jwt_utils import create_token
 from auth.hashing import hashing, verify_hash
 from db.models import User
-from db.session import SessionLocal
+from db.session import get_session_local
 from db.schemas import AuthData
 
 
@@ -16,7 +16,7 @@ def register(data: AuthData):
     """
     hashed_pw = hashing(data.password)
     # Check with the DB
-    rdb = SessionLocal()
+    rdb = get_session_local()
     # Already exist user
     if rdb.query(User).filter_by(username=data.username).first():
         raise HTTPException(status_code=400, detail='Username exists')
@@ -34,7 +34,7 @@ def login(data: AuthData):
     """
     On Sign in
     """
-    rdb = SessionLocal()
+    rdb = get_session_local()
     user = rdb.query(User).filter_by(username=data.username).first()
     if not user or not verify_hash(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail='Invalid credentials')

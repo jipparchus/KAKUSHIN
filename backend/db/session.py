@@ -19,13 +19,16 @@ from sqlalchemy.orm import sessionmaker
 
 from backend.config import load_config
 
-config = load_config()
-engine = create_engine(config['database']['uri'], echo=True)
-SessionLocal = sessionmaker(bind=engine)
 
-# def get_db():
-#     db = SessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()  # Clean up
+# engine = create_engine(config['database']['uri'], echo=True)
+# SessionLocal = sessionmaker(bind=engine)
+
+
+def get_engine():
+    config = load_config()
+    return create_engine(config['database']['uri'], echo=True)
+
+
+def get_session_local():
+    engine = get_engine()
+    return sessionmaker(bind=engine)

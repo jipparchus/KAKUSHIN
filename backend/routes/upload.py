@@ -2,11 +2,12 @@ import os
 from fastapi import APIRouter, File, UploadFile, Depends, HTTPException, Header
 from auth.jwt_utils import decode_token
 from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
+from sqlalchemy.orm import Session
 from typing import List, Optional
-from config import config
+from config import load_config
 from db.dependency import get_db
 from auth.dependencies import get_current_user
-from db.session import SessionLocal
+# from db.session import SessionLocal
 from db.models import CameraMatrix
 from core.modules.cam_utils import get_camera_matrix
 from core.modules.data_objects import VideoData
@@ -14,7 +15,6 @@ from core.modules.visual_odometry import rgbd_vo
 from utils.img_tools import encode_images
 
 router = APIRouter()
-UPLOAD_DIR = config['paths']['assets']
 
 
 def get_user_id(authorization: str = Header(...)):
@@ -32,7 +32,7 @@ def get_user_id(authorization: str = Header(...)):
 @router.post("/images")
 async def upload_images(
     images: List[UploadFile] = File(...),
-    db: SessionLocal = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
     mode: Optional[str] = Header(None),  # Get custom header 'mode'
 ):
@@ -70,6 +70,8 @@ async def upload_video(
     video: UploadFile = File(...),
     user_id: int = Depends(get_user_id)
 ):
+    config = load_config()
+    UPLOAD_DIR = config['paths']['assets']
     folder = os.path.join(UPLOAD_DIR, str(user_id))
     os.makedirs(folder, exist_ok=True)
     filepath = os.path.join(folder, video.filename)
@@ -81,12 +83,13 @@ async def upload_video(
 
     del video
     video = VideoData(filepath)
+    video.get_human_pose()
     # Do the core analyis
-    path_pointcloud = rgbd_vo(video)
+    # path_pointcloud = rgbd_vo(video)
 
     # return JSONResponse({"status": "success"})
     # return FileResponse(path_pointcloud, media_type='application/octet-stream', filename=os.path.basename(path_pointcloud))
-    return StreamingResponse(open(path_pointcloud, "rb"),
+    return StreamingResponse(open(filepath, "rb"),
                              media_type="application/octet-stream",
                              headers={"Content-Disposition": "attachment; filename=result.ply"}
                              )

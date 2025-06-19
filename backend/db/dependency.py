@@ -10,11 +10,11 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.add(...)
 """
 
-from backend.db.session import SessionLocal
+from backend.db.session import get_session_local
 
 
 def get_db():
-    db = SessionLocal()
+    db = get_session_local()
     try:
         yield db
     finally:

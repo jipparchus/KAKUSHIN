@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 import subprocess
-from config import config
+from config import load_config
 
 
 def standardize_fsize(frame, target_size=640):
@@ -52,6 +52,7 @@ Video Depth Estimation
 
 
 def get_depth_video(video_path):
+    config = load_config()
     # Script directory
     model = 'vits'  # Large: 'vitl', Small: 'vits'
     max_res = 720
