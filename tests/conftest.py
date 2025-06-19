@@ -2,12 +2,10 @@ import pytest
 from unittest import mock
 import os
 import yaml
-from fastapi import FastAPI, APIRouter
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from backend.main import app
 from backend.db.dependency import get_db
 from backend.db.models import Base
 
@@ -31,6 +29,8 @@ def pytest_configure():
     mock_jwt_utils.create_token.return_value = "mocked_token"
     mock_jwt_utils.decode_token.return_value = {"user_id": "mocked-id"}
     mock.patch("backend.auth.jwt_utils", mock_jwt_utils).start()
+
+    from backend.main import app
 
 
 """
