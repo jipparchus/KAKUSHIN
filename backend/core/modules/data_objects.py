@@ -11,8 +11,8 @@ import copy
 import mediapipe as mp
 
 
-from core.modules.video_utils import standardize_fsize
-from core.modules.mask_utils import Masker
+from backend.core.modules.video_utils import standardize_fsize
+from backend.core.modules.mask_utils import Masker
 
 
 @dataclass

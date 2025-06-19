@@ -1,7 +1,7 @@
 import os
 
-from core.modules.video_utils import get_depth_video
-from core.modules.data_objects import VideoData
+from backend.core.modules.video_utils import get_depth_video
+from backend.core.modules.data_objects import VideoData
 
 
 def rgbd_vo(rgb_video: VideoData):

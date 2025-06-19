@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 import subprocess
-from config import load_config
+from backend.config import load_config
 
 
 def standardize_fsize(frame, target_size=640):
