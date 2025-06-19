@@ -70,7 +70,6 @@ def mock_jwt_utils(mocker):
     # Patch create_token wherever it's imported and used
     patch_paths = [
         'backend.routes.auth.create_token',
-        'backend.routes.upload.create_token',
         'backend.auth.dependencies.decode_token',
         'backend.routes.upload.decode_token',
     ]
