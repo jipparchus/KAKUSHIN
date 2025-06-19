@@ -10,7 +10,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.add(...)
 """
 
-from db.session import SessionLocal
+from backend.db.session import SessionLocal
 
 
 def get_db():
