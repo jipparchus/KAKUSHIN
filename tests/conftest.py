@@ -7,17 +7,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-from backend.db.dependency import get_db
-from backend.db.models import Base
-
-# from test_config import test_config
-
-
-# Create FastAPI instance
-app = FastAPI()
-# app.include_router(auth.router, prefix="/auth")
-app.include_router(APIRouter(), prefix="/auth")
-
 """
 Mocks
 """
@@ -30,6 +19,17 @@ def mock_auth(mocker):
     with open(config_path, 'r') as f:
         mock.return_value = yaml.safe_load(f)
     return mock
+
+from backend.db.dependency import get_db
+from backend.db.models import Base
+
+# from test_config import test_config
+
+
+# Create FastAPI instance
+app = FastAPI()
+# app.include_router(auth.router, prefix="/auth")
+app.include_router(APIRouter(), prefix="/auth")
 
 
 # Test DB configuration — SQLite in-memory
