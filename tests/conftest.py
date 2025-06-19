@@ -39,10 +39,6 @@ def pytest_configure():
     ).start()
 
 
-
-    from backend.main import app
-
-
 """
 Mocks
 """
@@ -95,6 +91,16 @@ Mocks
 # app.include_router(APIRouter(), prefix="/auth")
 
 
+@pytest.fixture(scope="session")
+def app():
+    """
+    FastAPI app fixture
+    This fixture provide the FastAPI instance for testing.
+    """
+    from backend.main import app as real_app
+    return real_app
+
+
 # Test DB configuration — SQLite in-memory
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 # Create engine and session
@@ -105,7 +111,7 @@ engine = create_engine(
 TestingSessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
-# DB fixture: create/drop tables around each test
+# Fixture: test database session
 @pytest.fixture(scope="function")
 def db():
     Base.metadata.create_all(bind=engine)
@@ -117,18 +123,15 @@ def db():
         Base.metadata.drop_all(bind=engine)
 
 
+# Fixture: test client using shared db fixture
 @pytest.fixture(scope="function")
-def client(db):
+def client(app, db):
     def override_get_db():
         """
         Dependency override
         Replace the backend.dependency.get_db() with a test version that points to the test database.
         """
-        db = TestingSessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
+        yield db
     # Telling FastAPI that whenever Depends(get_db) is called, it should use override_get_db instead.
     app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
