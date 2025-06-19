@@ -33,8 +33,12 @@ Start API
 """
 # Create FastAPI instance
 app = FastAPI()
-
 # https://qiita.com/kurumaebi65/items/74e2edf8a394cf086c9a
+# Authentication: Who are you?
+# Authorization: What can you do? - JWT can carry role as well.
+app.include_router(auth.router, prefix="/auth")
+app.include_router(user_info.router, prefix="/user")
+app.include_router(upload.router, prefix="/upload")
 
 
 @app.exception_handler(RequestValidationError)
@@ -47,11 +51,6 @@ async def handler(request: Request, exc: RequestValidationError):
     print('###############################################')
     return JSONResponse(content={}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-# Authentication: Who are you?
-# Authorization: What can you do? - JWT can carry role as well.
-app.include_router(auth.router, prefix="/auth")
-app.include_router(user_info.router, prefix="/user")
-app.include_router(upload.router, prefix="/upload")
 
 if __name__ == '__main__':
     """
