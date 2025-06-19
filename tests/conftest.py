@@ -7,6 +7,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
+from backend.db.dependency import get_db
+from backend.db.models import Base
+
+# from test_config import test_config
+
+
 """
 Mocks
 """
@@ -14,16 +20,11 @@ Mocks
 
 @pytest.fixture(autouse=True)
 def mock_auth(mocker):
-    mock = mocker.patch('config.config')
+    mock = mocker.patch('backend.config.config')
     config_path = os.path.join(os.path.dirname(__file__), 'test_config.yaml')
     with open(config_path, 'r') as f:
         mock.return_value = yaml.safe_load(f)
     return mock
-
-from backend.db.dependency import get_db
-from backend.db.models import Base
-
-# from test_config import test_config
 
 
 # Create FastAPI instance
