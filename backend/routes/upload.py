@@ -1,17 +1,17 @@
 import os
 from fastapi import APIRouter, File, UploadFile, Depends, HTTPException, Header
-from auth.jwt_utils import decode_token
 from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from config import load_config
-from db.dependency import get_db
-from auth.dependencies import get_current_user
-from db.models import CameraMatrix
-from core.modules.cam_utils import get_camera_matrix
-from core.modules.data_objects import VideoData
-from core.modules.visual_odometry import rgbd_vo
-from utils.img_tools import encode_images
+from backend.auth.dependencies import get_current_user
+from backend.auth.jwt_utils import decode_token
+from backend.config import load_config
+from backend.core.modules.cam_utils import get_camera_matrix
+from backend.core.modules.data_objects import VideoData
+from backend.core.modules.visual_odometry import rgbd_vo
+from backend.db.dependency import get_db
+from backend.db.models import CameraMatrix
+from backend.utils.img_tools import encode_images
 
 router = APIRouter()
 

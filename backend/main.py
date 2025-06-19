@@ -18,13 +18,13 @@ or:
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 """
 
-from fastapi import FastAPI, Request, status
+import json
+from fastapi import FastAPI, Request, status, APIRouter
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from routes import upload
-from routes import auth
-from routes import user_info
-import json
+from backend.routes import upload
+from backend.routes import auth
+from backend.routes import user_info
 import backend.db.init_rdb as init_rdb
 
 

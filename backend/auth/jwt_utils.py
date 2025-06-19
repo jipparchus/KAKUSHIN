@@ -7,7 +7,7 @@ Module related to JWT access token
 
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from config import load_config
+from backend.config import load_config
 
 config = load_config()
 SECRET_KEY = config['secret']['jwt_key']

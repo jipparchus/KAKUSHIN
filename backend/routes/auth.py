@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from auth.jwt_utils import create_token
-from auth.hashing import hashing, verify_hash
-from db.models import User
-from db.session import get_session_local
-from db.schemas import AuthData
+from backend.auth.jwt_utils import create_token
+from backend.auth.hashing import hashing, verify_hash
+from backend.db.models import User
+from backend.db.session import get_session_local
+from backend.db.schemas import AuthData
 
 
 router = APIRouter()
