@@ -4,10 +4,10 @@ Create a SQLite database based on /models.py
 import os
 from sqlalchemy import create_engine
 
-from config import load_config
+from backend.config import load_config
 
 # DATABASE MODELS
-from db.models import Base
+from backend.db.models import Base
 
 
 def main():

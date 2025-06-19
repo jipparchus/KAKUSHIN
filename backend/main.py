@@ -25,7 +25,7 @@ from routes import upload
 from routes import auth
 from routes import user_info
 import json
-import db.init_rdb as init_rdb
+import backend.db.init_rdb as init_rdb
 
 
 """

@@ -6,11 +6,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-
+from backend import app
 from backend.db.dependency import get_db
 from backend.db.models import Base
-
-# from test_config import test_config
 
 
 """
@@ -28,9 +26,8 @@ def mock_auth(mocker):
 
 
 # Create FastAPI instance
-app = FastAPI()
-# app.include_router(auth.router, prefix="/auth")
-app.include_router(APIRouter(), prefix="/auth")
+# app = FastAPI()
+# app.include_router(APIRouter(), prefix="/auth")
 
 
 # Test DB configuration — SQLite in-memory
