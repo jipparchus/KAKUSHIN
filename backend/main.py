@@ -19,7 +19,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 """
 
 import json
-from fastapi import FastAPI, Request, status, APIRouter
+from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from backend.routes import upload
