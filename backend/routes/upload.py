@@ -7,7 +7,6 @@ from typing import List, Optional
 from config import load_config
 from db.dependency import get_db
 from auth.dependencies import get_current_user
-# from db.session import SessionLocal
 from db.models import CameraMatrix
 from core.modules.cam_utils import get_camera_matrix
 from core.modules.data_objects import VideoData

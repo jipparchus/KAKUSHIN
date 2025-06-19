@@ -20,10 +20,6 @@ from sqlalchemy.orm import sessionmaker
 from backend.config import load_config
 
 
-# engine = create_engine(config['database']['uri'], echo=True)
-# SessionLocal = sessionmaker(bind=engine)
-
-
 def get_engine():
     config = load_config()
     return create_engine(config['database']['uri'], echo=True)
