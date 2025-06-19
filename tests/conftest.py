@@ -69,10 +69,10 @@ def mock_auth(mocker):
 def mock_jwt_utils(mocker):
     # Patch create_token wherever it's imported and used
     patch_paths = [
-        'backend.routes.auth.jwt_utils.create_token',
-        'backend.routes.auth.jwt_utils.decode_token',
-        'backend.routes.upload.jwt_utils.create_token',
-        'backend.routes.user_info.jwt_utils.decode_token',
+        'backend.routes.auth.create_token',
+        'backend.routes.auth.decode_token',
+        'backend.routes.upload.create_token',
+        'backend.routes.user_info.decode_token',
     ]
 
     patches = {}
@@ -80,7 +80,7 @@ def mock_jwt_utils(mocker):
         name = path.split('.')[-1]
         mock = mocker.patch(path)
         mock.return_value = "mocked" if "create" in name else {"user_id": "mocked-id"}
-        patches[name] = mock
+        patches[path] = mock
     yield patches
 
 
