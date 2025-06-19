@@ -39,6 +39,51 @@ def pytest_configure():
     ).start()
 
 
+"""
+Mocks
+"""
+
+
+@pytest.fixture(autouse=True)
+def mock_auth(mocker):
+    config_path = os.path.join(os.path.dirname(__file__), 'test_config.yaml')
+    # Patch load_config wherever it's imported and used
+    patch_paths = [
+        'backend.auth.jwt_utils.load_config',
+        'backend.core.modules.video_utils.load_config',
+        'backend.db.init_rdb.load_config',
+        'backend.db.session.load_config',
+        'backend.routes.upload.load_config',
+    ]
+
+    patches = {}
+    for path in patch_paths:
+        mock = mocker.patch(path)
+        with open(config_path, 'r') as f:
+            mock.return_value = yaml.safe_load(f)
+            patches[path] = mock
+    yield patches
+
+
+@pytest.fixture(autouse=True)
+def mock_jwt_utils(mocker):
+    # Patch create_token wherever it's imported and used
+    patch_paths = [
+        'backend.routes.auth.create_token',
+        'backend.routes.auth.decode_token',
+        'backend.routes.upload.create_token',
+        'backend.routes.user_info.decode_token',
+    ]
+
+    patches = {}
+    for path in patch_paths:
+        name = path.split('.')[-1]
+        mock = mocker.patch(path)
+        mock.return_value = "mocked" if "create" in name else {"user_id": "mocked-id"}
+        patches[name] = mock
+    yield patches
+
+
 @pytest.fixture(scope="session")
 def app():
     """
