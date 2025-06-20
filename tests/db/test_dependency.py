@@ -7,7 +7,6 @@ def test_get_db(app):
     original_override = app.dependency_overrides.get(get_db)
     # Temporarily remove the override
     app.dependency_overrides.pop(get_db, None)
-    from backend.db.dependency import get_db
     db = next(get_db())
     assert isinstance(db, Session)
     # Close the session
