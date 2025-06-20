@@ -20,7 +20,7 @@ def test_config(tmp_path):
 
 # 1. Database already exists
 def test_main_db_exists(tmp_path, test_config):
-    assert not os.path.exists(test_config['path']['database'])
+    assert not os.path.exists(test_config['paths']['database'])
     # Temporary patch load_config with various configurations
     with mock.patch('backend.config.load_config', return_value=test_config):
         report = main()
