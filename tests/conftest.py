@@ -1,3 +1,18 @@
+"""
+Mock patches as pytest fixtures:
+- `backend.config.load_config`
+- `backend.auth.jwt_utils.create_token`
+- `backend.auth.jwt_utils.decode_token`
+- `app`
+- `engine`
+- `db`
+- `client`
+
+FastAPI dependency overrides:
+- `get_db`
+"""
+
+
 import pytest
 from unittest import mock
 import os
