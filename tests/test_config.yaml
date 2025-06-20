@@ -8,7 +8,7 @@ secret:
 database:
   path: "../database/"
   name: "data.db"
-  uri: "sqlite:///../database/test_data.db"
+  uri: "sqlite:///:memory:"
   
 paths:
   backend: "../backend"
