@@ -15,6 +15,7 @@ def tmp_config():
     temp DB file for testing
     This is a function used for temporary patch of the load_config with various configurations
     """
+    mock.patch.stopall()
     db_path = 'test_database_temp.db'
     return {
         'paths': {
@@ -25,21 +26,23 @@ def tmp_config():
     }
 
 
-@pytest.fixture
-def tmp_get_engine(tmp_path):
-    engine = create_engine(
-        tmp_config['database']['uri'],
-        connect_args={'check_same_thread': False},  # required for sqlite
-        poolclass=StaticPool,  # Needed to persist DB across sessions
-        echo=False,
-        )
-    return engine
+# @pytest.fixture
+# def tmp_get_engine(tmp_config):
+#     config = tmp_config()
+#     engine = create_engine(
+#         config['database']['uri'],
+#         connect_args={'check_same_thread': False},  # required for sqlite
+#         poolclass=StaticPool,  # Needed to persist DB across sessions
+#         echo=False,
+#         )
+#     return engine
 
 
 # 1. Database already exists
 @pytest.mark.no_mock_config
-def test_main_db_exists(tmp_path, tmp_config):
-    db_path = tmp_config['paths']['database']
+def test_main_db_exists(tmp_config):
+    config = tmp_config
+    db_path = config['paths']['database']
     # Create a temporary file to simulate an existing file
     open(db_path, 'w').close()
     # Temporary patch for load_config
@@ -55,8 +58,9 @@ def test_main_db_exists(tmp_path, tmp_config):
 
 # 2. Database created successfully
 @pytest.mark.no_mock_config
-def test_main_db_created(tmp_path, tmp_config):
-    db_path = tmp_config['paths']['database']
+def test_main_db_created(tmp_config):
+    config = tmp_config
+    db_path = config['paths']['database']
     assert not os.path.exists(db_path)
     # Temporary patch for load_config
     with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config):
@@ -69,8 +73,9 @@ def test_main_db_created(tmp_path, tmp_config):
 
 # 3. Exception during creation of database
 @pytest.mark.no_mock_config
-def test_main_db_exception(tmp_path, tmp_config):
-    assert not os.path.exists(tmp_config['paths']['database'])
+def test_main_db_exception(tmp_config):
+    config = tmp_config
+    assert not os.path.exists(config['paths']['database'])
     # Temporary patch for load_config
     with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config), \
             mock.patch('backend.db.init_rdb.get_engine', side_effect=Exception('engine fault')):
