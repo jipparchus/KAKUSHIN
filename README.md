@@ -1,3 +1,5 @@
+[![codecov.io](https://codecov.io/github/jipparchus/KAKUSHIN/coverage.svg?branch=main)](https://app.codecov.io/github/jipparchus/KAKUSHIN?branch=main)
+
 # 3D Climbing Analysis Tool
 
 An App to provide insight for your attempts by innovative ("Kakushin" "革新") analysis to assist you to overcome the core ("Kakushin" "核心") of the problem.
