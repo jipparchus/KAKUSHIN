@@ -8,6 +8,7 @@ from backend.config import load_config
 
 # DATABASE MODELS
 from backend.db.models import Base
+from backend.db.session import get_engine
 
 
 def main():
@@ -15,10 +16,7 @@ def main():
     if os.path.exists(config['paths']['database']):
         return 0
     else:
-        engine = create_engine(
-            config['database']['uri'],
-            echo=True
-        )
+        engine = get_engine()
         # CREATE TABLES
         Base.metadata.create_all(engine)
         return 0
