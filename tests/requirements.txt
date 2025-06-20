@@ -6,3 +6,4 @@ pyaml
 fastapi
 sqlalchemy
 python-jose[cryptography]
+numpy
