@@ -5,6 +5,7 @@ import yaml
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from backend.db.dependency import get_db
 from backend.db.models import Base
@@ -101,8 +102,9 @@ def engine():
     # Create engine and session
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,
-        echo=False,
         connect_args={"check_same_thread": False},  # required for sqlite
+        poolclass=StaticPool,  # Needed to persist DB across sessions
+        echo=False,
     )
     yield engine
 

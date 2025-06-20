@@ -16,6 +16,7 @@ rdb.close()
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from backend.config import load_config
 
@@ -25,6 +26,7 @@ def get_engine():
     engine = create_engine(
         config['database']['uri'],
         connect_args={'check_same_thread': False},  # required for sqlite
+        poolclass=StaticPool,  # Needed to persist DB across sessions
         echo=False,
         )
     return engine
