@@ -24,7 +24,8 @@ def test_main_db_exists(tmp_path, test_config):
     # Create a temporary file to simulate an existing file
     open(db_path, 'w').close()
     # Temporary patch for load_config
-    with mock.patch('backend.config.load_config', return_value=test_config):
+    # with mock.patch('backend.config.load_config', return_value=test_config):
+    with mock.patch('backend.db.init_rdb.load_config', return_value=test_config):
         report = main()
         assert os.path.exists(db_path)
         assert isinstance(report, dict)
