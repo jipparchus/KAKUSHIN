@@ -11,6 +11,7 @@ def test_config(tmp_path):
     temp DB file for testing
     This is a function used for temporary patch of the load_config with various configurations
     """
+    mock.patch.stopall()
     db_path = tmp_path / 'test_database_temp.db'
     return {
         'paths': {
