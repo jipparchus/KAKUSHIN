@@ -4,7 +4,6 @@ from backend.auth.jwt_utils import create_token
 from backend.auth.hashing import hashing, verify_hash
 from backend.db.dependency import get_db
 from backend.db.models import User
-from backend.db.session import get_session_local
 from backend.db.schemas import AuthData
 
 
