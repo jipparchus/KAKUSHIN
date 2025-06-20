@@ -12,10 +12,7 @@ open3d
 mediapipe
 ipympl
 ipykernel
-pytest
-pytest-cov
-pytest-mock
-httpx
+
 
 # torch_geometric
 # scikit-learn
