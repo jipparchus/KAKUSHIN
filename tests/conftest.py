@@ -61,7 +61,16 @@ Mocks
 
 
 @pytest.fixture(autouse=True)
-def mock_load_config(mocker):
+def mock_load_config(request, mocker):
+    """
+    Add decorator to skip this fixture
+    e.g.
+    @pytest.mark.no_mock_config
+    def test_custom_config():
+        ....
+    """
+    if "no_mock_config" in request.keywords:
+        return  # Skip this fixture for marked tests
     config_path = os.path.join(os.path.dirname(__file__), 'test_config.yaml')
     # Patch load_config wherever it's imported and used
     patch_paths = [
