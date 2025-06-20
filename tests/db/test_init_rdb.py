@@ -5,7 +5,7 @@ from unittest import mock
 from backend.db.init_rdb import main
 
 
-@pytest.mark.no_mocking
+@pytest.fixture
 def test_config(tmp_path):
     """
     temp DB file for testing
@@ -19,6 +19,7 @@ def test_config(tmp_path):
 
 
 # 1. Database already exists
+@pytest.mark.no_mocking
 def test_main_db_exists(tmp_path, test_config):
     db_path = test_config['paths']['database']
     # Create a temporary file to simulate an existing file
@@ -35,6 +36,7 @@ def test_main_db_exists(tmp_path, test_config):
 
 
 # 2. Database created successfully
+@pytest.mark.no_mocking
 def test_main_db_created(tmp_path, test_config):
     db_path = test_config['paths']['database']
     assert not os.path.exists(db_path)
@@ -48,6 +50,7 @@ def test_main_db_created(tmp_path, test_config):
 
 
 # 3. Exception during creation of database
+@pytest.mark.no_mocking
 def test_main_db_exception(tmp_path, test_config):
     assert not os.path.exists(test_config['paths']['database'])
     # Temporary patch for load_config
