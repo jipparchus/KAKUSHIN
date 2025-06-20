@@ -2,11 +2,15 @@ import os
 import pytest
 from unittest import mock
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+
 from backend.db.init_rdb import main
 
 
 @pytest.fixture
-def test_config(tmp_path):
+def tmp_config(tmp_path):
     """
     temp DB file for testing
     This is a function used for temporary patch of the load_config with various configurations
@@ -14,18 +18,32 @@ def test_config(tmp_path):
     db_path = tmp_path / 'test_database_temp.db'
     return {
         'paths': {
-            'database': str(db_path)}
+            'database': str(db_path)},
+        'database': {
+            'uri': f'sqlite:///{str(db_path)}',
+        }
     }
 
 
+@pytest.fixture
+def tmp_get_engine(tmp_path):
+    engine = create_engine(
+        tmp_config['database']['uri'],
+        connect_args={'check_same_thread': False},  # required for sqlite
+        poolclass=StaticPool,  # Needed to persist DB across sessions
+        echo=False,
+        )
+    return engine
+
+
 # 1. Database already exists
-@pytest.mark.no_mocking
-def test_main_db_exists(tmp_path, test_config):
-    db_path = test_config['paths']['database']
+@pytest.mark.no_mock_config
+def test_main_db_exists(tmp_path, tmp_config):
+    db_path = tmp_config['paths']['database']
     # Create a temporary file to simulate an existing file
     open(db_path, 'w').close()
     # Temporary patch for load_config
-    with mock.patch('backend.db.init_rdb.config.load_config', return_value=test_config):
+    with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config):
         report = main()
         assert os.path.exists(db_path)
         assert isinstance(report, dict)
@@ -36,12 +54,12 @@ def test_main_db_exists(tmp_path, test_config):
 
 
 # 2. Database created successfully
-@pytest.mark.no_mocking
-def test_main_db_created(tmp_path, test_config):
-    db_path = test_config['paths']['database']
+@pytest.mark.no_mock_config
+def test_main_db_created(tmp_path, tmp_config):
+    db_path = tmp_config['paths']['database']
     assert not os.path.exists(db_path)
     # Temporary patch for load_config
-    with mock.patch('backend.db.init_rdb.config.load_config', return_value=test_config):
+    with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config):
         report = main()
         assert isinstance(report, dict)
         assert report['message'] == 'Database created successfully.'
@@ -50,11 +68,11 @@ def test_main_db_created(tmp_path, test_config):
 
 
 # 3. Exception during creation of database
-@pytest.mark.no_mocking
-def test_main_db_exception(tmp_path, test_config):
-    assert not os.path.exists(test_config['paths']['database'])
+@pytest.mark.no_mock_config
+def test_main_db_exception(tmp_path, tmp_config):
+    assert not os.path.exists(tmp_config['paths']['database'])
     # Temporary patch for load_config
-    with mock.patch('backend.db.init_rdb.config.load_config', return_value=test_config), \
+    with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config), \
             mock.patch('backend.db.init_rdb.get_engine', side_effect=Exception('engine fault')):
         report = main()
         assert isinstance(report, dict)
