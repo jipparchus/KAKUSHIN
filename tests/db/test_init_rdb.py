@@ -30,6 +30,8 @@ def test_main_db_exists(tmp_path, test_config):
         assert isinstance(report, dict)
         assert report['message'] == 'Database already exists. Skipping initialization.'
         assert report['db_path'] == db_path
+        # Clean up the file
+        os.remove(db_path)
 
 
 # 2. Database created successfully
