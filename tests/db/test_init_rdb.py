@@ -20,17 +20,27 @@ def test_config(tmp_path):
 
 # 1. Database already exists
 def test_main_db_exists(tmp_path, test_config):
-    assert not os.path.exists(test_config['paths']['database'])
-    # Temporary patch load_config with various configurations
+    # Temporary patch for load_config
     with mock.patch('backend.config.load_config', return_value=test_config):
+        db_path = test_config['paths']['database']
+        # Create a teporary file to simulate an existing file
+        open(db_path, 'w').close()
         report = main()
+        assert os.path.exists(db_path)
         assert isinstance(report, dict)
         assert report['message'] == 'Database already exists. Skipping initialization.'
-        assert report['db_path'] == test_config['paths']['database']
+        assert report['db_path'] == db_path
 
 
 # 2. Database created successfully
-
+def test_main_db_created(tmp_path, test_config):
+    assert not os.path.exists(test_config['paths']['database'])
+    # Temporary patch for load_config
+    with mock.patch('backend.config.load_config', return_value=test_config):
+        report = main()
+        assert isinstance(report, dict)
+        assert report['message'] == 'Database created successfully.'
+        assert report['db_path'] == test_config['paths']['database']
 
 
 
