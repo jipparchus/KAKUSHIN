@@ -2,7 +2,7 @@ import os
 import pytest
 from unittest import mock
 
-from backend.init_rdb import main
+from backend.db.init_rdb import main
 
 
 @pytest.fixture
