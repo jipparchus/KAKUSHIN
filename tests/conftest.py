@@ -67,7 +67,7 @@ def mock_load_config(mocker):
     patch_paths = [
         'backend.auth.jwt_utils.load_config',
         'backend.core.modules.video_utils.load_config',
-        'backend.db.init_rdb.load_config',
+        'backend.db.init_rdb.config.load_config',
         'backend.db.session.load_config',
         'backend.routes.upload.load_config',
     ]
