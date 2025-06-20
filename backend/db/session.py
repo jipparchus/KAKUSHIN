@@ -22,7 +22,11 @@ from backend.config import load_config
 
 def get_engine():
     config = load_config()
-    engine = create_engine(config['database']['uri'], echo=True)
+    engine = create_engine(
+        config['database']['uri'],
+        connect_args={'check_same_thread': False},  # required for sqlite
+        echo=False,
+        )
     return engine
 
 
