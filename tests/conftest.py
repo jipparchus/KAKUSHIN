@@ -61,7 +61,7 @@ Mocks
 
 
 @pytest.fixture(autouse=True)
-def mock_auth(mocker):
+def mock_load_config(mocker):
     config_path = os.path.join(os.path.dirname(__file__), 'test_config.yaml')
     # Patch load_config wherever it's imported and used
     patch_paths = [
