@@ -5,3 +5,4 @@ httpx
 pyaml
 fastapi
 sqlalchemy
+python-jose[cryptography]
