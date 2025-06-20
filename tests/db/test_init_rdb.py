@@ -24,7 +24,7 @@ def test_main_db_exists(tmp_path, test_config):
     # Create a temporary file to simulate an existing file
     open(db_path, 'w').close()
     # Temporary patch for load_config
-    with mock.patch('backend.db.init_rdb.load_config', return_value=test_config):
+    with mock.patch('backend.db.init_rdb.config.load_config', return_value=test_config):
         report = main()
         assert os.path.exists(db_path)
         assert isinstance(report, dict)
@@ -39,7 +39,7 @@ def test_main_db_created(tmp_path, test_config):
     db_path = test_config['paths']['database']
     assert not os.path.exists(db_path)
     # Temporary patch for load_config
-    with mock.patch('backend.db.init_rdb.load_config', return_value=test_config):
+    with mock.patch('backend.db.init_rdb.config.load_config', return_value=test_config):
         report = main()
         assert isinstance(report, dict)
         assert report['message'] == 'Database created successfully.'
@@ -51,7 +51,7 @@ def test_main_db_created(tmp_path, test_config):
 def test_main_db_exception(tmp_path, test_config):
     assert not os.path.exists(test_config['paths']['database'])
     # Temporary patch for load_config
-    with mock.patch('backend.db.init_rdb.load_config', return_value=test_config), \
+    with mock.patch('backend.db.init_rdb.config.load_config', return_value=test_config), \
             mock.patch('backend.db.init_rdb.get_engine', side_effect=Exception('engine fault')):
         report = main()
         assert isinstance(report, dict)
