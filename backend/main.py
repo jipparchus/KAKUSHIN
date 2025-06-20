@@ -56,4 +56,5 @@ if __name__ == '__main__':
     """
     Database initialisation
     """
-    init_rdb.main()
+    report = init_rdb.main()
+    print(report)
