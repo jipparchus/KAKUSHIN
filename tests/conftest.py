@@ -93,19 +93,17 @@ def app():
     return real_app
 
 
-# Test DB configuration — SQLite in-memory
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
-# Create engine and session
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    echo=True
-)
-TestingSessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
-
-
 # Fixture: test database session
 @pytest.fixture(scope="function")
 def db():
+    # Test DB configuration — SQLite in-memory
+    SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+    # Create engine and session
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        echo=True
+    )
+    TestingSessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
     Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     try:
