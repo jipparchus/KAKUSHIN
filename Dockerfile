@@ -44,6 +44,9 @@ RUN python -m pip install --upgrade pip
 COPY /backend/requirements.txt ./requirements.txt
 RUN conda run -n kakushin pip install --no-cache-dir -r requirements.txt
 
+# Set Python path
+ENV PYTHONPATH=/backend
+
 # Expose FastAPI port
 EXPOSE 8000
 
