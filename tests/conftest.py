@@ -71,23 +71,24 @@ def mock_load_config(request, mocker):
     """
     if "no_mock_config" in request.keywords:
         yield  # Skip this fixture for marked tests
-    config_path = os.path.join(os.path.dirname(__file__), 'test_config.yaml')
-    # Patch load_config wherever it's imported and used
-    patch_paths = [
-        'backend.auth.jwt_utils.load_config',
-        'backend.core.modules.video_utils.load_config',
-        'backend.db.init_rdb.config.load_config',
-        'backend.db.session.load_config',
-        'backend.routes.upload.load_config',
-    ]
+    else:
+        config_path = os.path.join(os.path.dirname(__file__), 'test_config.yaml')
+        # Patch load_config wherever it's imported and used
+        patch_paths = [
+            'backend.auth.jwt_utils.load_config',
+            'backend.core.modules.video_utils.load_config',
+            'backend.db.init_rdb.config.load_config',
+            'backend.db.session.load_config',
+            'backend.routes.upload.load_config',
+        ]
 
-    patches = {}
-    for path in patch_paths:
-        mock = mocker.patch(path)
-        with open(config_path, 'r') as f:
-            mock.return_value = yaml.safe_load(f)
-            patches[path] = mock
-    yield patches
+        patches = {}
+        for path in patch_paths:
+            mock = mocker.patch(path)
+            with open(config_path, 'r') as f:
+                mock.return_value = yaml.safe_load(f)
+                patches[path] = mock
+        yield patches
 
 
 @pytest.fixture(autouse=True)
