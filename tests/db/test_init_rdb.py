@@ -21,50 +21,56 @@ def tmp_config(mocker):
                 'uri': f'sqlite:///:memory:{db_path}',
             }
         }
-    # patch_paths = [
-    #     'backend.db.init_rdb.config.load_config',
-    #     'backend.db.session.load_config',
-    # ]
-    # patches = {}
-    # for path in patch_paths:
-    #     mock = mocker.patch(path)
-    #     mock.return_value = fake_config
-    #     patches[path] = mock
-    # yield patches
-    return fake_config
+    patch_paths = [
+        'backend.db.init_rdb.config.load_config',
+        'backend.db.session.load_config',
+    ]
+    patches = {}
+    for path in patch_paths:
+        mock = mocker.patch(path)
+        mock.return_value = fake_config
+        patches[path] = mock
+    yield patches
+
 
 # @pytest.fixture()
 # def tmp_get_engine():
 
-# @pytest.fixture
-# def tmp_get_engine(tmp_config):
-#     config = tmp_config()
-#     engine = create_engine(
-#         config['database']['uri'],
-#         connect_args={'check_same_thread': False},  # required for sqlite
-#         poolclass=StaticPool,  # Needed to persist DB across sessions
-#         echo=False,
-#         )
-#     return engine
+# @pytest.mark.no_mock_config
+# def test_main_db_exists(tmp_config):
+#     from backend.db.init_rdb import main
+#     config = tmp_config
+#     db_path = config['paths']['database']
+#     # Create a temporary file to simulate an existing file
+#     open(db_path, 'w').close()
+#     # Temporary patch for load_config
+#     with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config):
+#         report = main()
+#         assert os.path.exists(db_path)
+#         assert isinstance(report, dict)
+#         assert report['message'] == 'Database already exists. Skipping initialization.'
+#         assert report['db_path'] == db_path
+#         # Clean up the file
+#         os.remove(db_path)
 
 
 # 1. Database already exists
 @pytest.mark.no_mock_config
-def test_main_db_exists(tmp_config):
+def test_main_db_exists():
     from backend.db.init_rdb import main
-    config = tmp_config
-    db_path = config['paths']['database']
+    from backend import config
+    config_dict = config.load_config()
+    db_path = config_dict['paths']['database']
     # Create a temporary file to simulate an existing file
     open(db_path, 'w').close()
-    # Temporary patch for load_config
-    with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config):
-        report = main()
-        assert os.path.exists(db_path)
-        assert isinstance(report, dict)
-        assert report['message'] == 'Database already exists. Skipping initialization.'
-        assert report['db_path'] == db_path
-        # Clean up the file
-        os.remove(db_path)
+    report = main()
+    assert os.path.exists(db_path)
+    assert isinstance(report, dict)
+    assert report == {}
+    assert report['message'] == 'Database already exists. Skipping initialization.'
+    assert report['db_path'] == db_path
+    # Clean up the file
+    os.remove(db_path)
 
 
 # 2. Database created successfully
