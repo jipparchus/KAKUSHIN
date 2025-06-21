@@ -2,10 +2,6 @@ import os
 import pytest
 from unittest import mock
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
 
 @pytest.fixture(autouse=True)
 def tmp_config(mocker):
@@ -31,27 +27,6 @@ def tmp_config(mocker):
         mock.return_value = fake_config
         patches[path] = mock
     yield patches
-
-
-# @pytest.fixture()
-# def tmp_get_engine():
-
-# @pytest.mark.no_mock_config
-# def test_main_db_exists(tmp_config):
-#     from backend.db.init_rdb import main
-#     config = tmp_config
-#     db_path = config['paths']['database']
-#     # Create a temporary file to simulate an existing file
-#     open(db_path, 'w').close()
-#     # Temporary patch for load_config
-#     with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config):
-#         report = main()
-#         assert os.path.exists(db_path)
-#         assert isinstance(report, dict)
-#         assert report['message'] == 'Database already exists. Skipping initialization.'
-#         assert report['db_path'] == db_path
-#         # Clean up the file
-#         os.remove(db_path)
 
 
 # 1. Database already exists

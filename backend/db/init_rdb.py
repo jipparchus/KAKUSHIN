@@ -27,7 +27,3 @@ def main():
         except Exception as e:
             report['message'] = str(e)
     return report
-
-
-if __name__ == '__main__':
-    main()
