@@ -84,7 +84,6 @@ def test_main_db_created():
     assert isinstance(report, dict)
     assert report['message'] == 'Database created successfully.'
     assert report['db_path'] == db_path
-    os.remove(db_path)
 
 
 # 3. Exception during creation of database
