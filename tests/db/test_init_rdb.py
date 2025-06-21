@@ -6,25 +6,32 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from backend.db.init_rdb import main
-
 
 @pytest.fixture(autouse=True)
-def tmp_config():
+def tmp_config(mocker):
     """
     temp DB file for testing
     This is a function used for temporary patch of the load_config with various configurations
     """
-    mock.patch.stopall()
     db_path = 'test_database_temp.db'
-    return {
-        'paths': {
-            'database': db_path},
-        'database': {
-            'uri': f'sqlite:///:memory:{db_path}',
+    fake_config = {
+            'paths': {
+                'database': db_path},
+            'database': {
+                'uri': f'sqlite:///:memory:{db_path}',
+            }
         }
-    }
-
+    # patch_paths = [
+    #     'backend.db.init_rdb.config.load_config',
+    #     'backend.db.session.load_config',
+    # ]
+    # patches = {}
+    # for path in patch_paths:
+    #     mock = mocker.patch(path)
+    #     mock.return_value = fake_config
+    #     patches[path] = mock
+    # yield patches
+    return fake_config
 
 # @pytest.fixture()
 # def tmp_get_engine():
@@ -44,6 +51,7 @@ def tmp_config():
 # 1. Database already exists
 @pytest.mark.no_mock_config
 def test_main_db_exists(tmp_config):
+    from backend.db.init_rdb import main
     config = tmp_config
     db_path = config['paths']['database']
     # Create a temporary file to simulate an existing file
@@ -62,6 +70,7 @@ def test_main_db_exists(tmp_config):
 # 2. Database created successfully
 @pytest.mark.no_mock_config
 def test_main_db_created(tmp_config):
+    from backend.db.init_rdb import main
     config = tmp_config
     db_path = config['paths']['database']
     assert not os.path.exists(db_path)
@@ -77,6 +86,7 @@ def test_main_db_created(tmp_config):
 # 3. Exception during creation of database
 @pytest.mark.no_mock_config
 def test_main_db_exception(tmp_config):
+    from backend.db.init_rdb import main
     config = tmp_config
     assert not os.path.exists(config['paths']['database'])
     # Temporary patch for load_config
