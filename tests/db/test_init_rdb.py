@@ -66,7 +66,6 @@ def test_main_db_exists():
     report = main()
     assert os.path.exists(db_path)
     assert isinstance(report, dict)
-    assert report == {}
     assert report['message'] == 'Database already exists. Skipping initialization.'
     assert report['db_path'] == db_path
     # Clean up the file
@@ -75,29 +74,29 @@ def test_main_db_exists():
 
 # 2. Database created successfully
 @pytest.mark.no_mock_config
-def test_main_db_created(tmp_config):
+def test_main_db_created():
     from backend.db.init_rdb import main
-    config = tmp_config
-    db_path = config['paths']['database']
+    from backend import config
+    config_dict = config.load_config()
+    db_path = config_dict['paths']['database']
     assert not os.path.exists(db_path)
-    # Temporary patch for load_config
-    with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config):
-        report = main()
-        assert isinstance(report, dict)
-        assert report['message'] == 'Database created successfully.'
-        assert report['db_path'] == db_path
-        os.remove(db_path)
+    report = main()
+    assert isinstance(report, dict)
+    assert report['message'] == 'Database created successfully.'
+    assert report['db_path'] == db_path
+    os.remove(db_path)
 
 
 # 3. Exception during creation of database
 @pytest.mark.no_mock_config
-def test_main_db_exception(tmp_config):
+def test_main_db_exception():
     from backend.db.init_rdb import main
-    config = tmp_config
-    assert not os.path.exists(config['paths']['database'])
+    from backend import config
+    config_dict = config.load_config()
+    db_path = config_dict['paths']['database']
+    assert not os.path.exists(db_path)
     # Temporary patch for load_config
-    with mock.patch('backend.db.init_rdb.config.load_config', return_value=tmp_config), \
-            mock.patch('backend.db.init_rdb.get_engine', side_effect=Exception('engine fault')):
+    with mock.patch('backend.db.init_rdb.get_engine', side_effect=Exception('engine fault')):
         report = main()
         assert isinstance(report, dict)
         assert 'engine fault' in report['message']
