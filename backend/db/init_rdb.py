@@ -13,16 +13,17 @@ def main():
     report = {}
     report['db_path'] = None
     config_dict = config.load_config()
-    if os.path.exists(config_dict['paths']['database']):
+    db_path = config_dict['paths']['database']
+    if os.path.exists(db_path):
         report['message'] = 'Database already exists. Skipping initialization.'
-        report['db_path'] = config_dict['paths']['database']
+        report['db_path'] = db_path
     else:
         try:
             engine = get_engine()
             # CREATE TABLES
             Base.metadata.create_all(engine)
             report['message'] = 'Database created successfully.'
-            report['db_path'] = str(engine.url)
+            report['db_path'] = db_path  # slightly different from engine.url
         except Exception as e:
             report['message'] = str(e)
     return report
