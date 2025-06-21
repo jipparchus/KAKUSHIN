@@ -9,7 +9,7 @@ from sqlalchemy.pool import StaticPool
 from backend.db.init_rdb import main
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def tmp_config():
     """
     temp DB file for testing
@@ -25,6 +25,9 @@ def tmp_config():
         }
     }
 
+
+# @pytest.fixture()
+# def tmp_get_engine():
 
 # @pytest.fixture
 # def tmp_get_engine(tmp_config):
@@ -58,7 +61,7 @@ def test_main_db_exists(tmp_config):
 
 # 2. Database created successfully
 @pytest.mark.no_mock_config
-def test_main_db_created(tmp_config):
+def test_main_db_created(tmp_config, tmp_get_engine):
     config = tmp_config
     db_path = config['paths']['database']
     assert not os.path.exists(db_path)
