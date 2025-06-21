@@ -61,7 +61,7 @@ def test_main_db_exists(tmp_config):
 
 # 2. Database created successfully
 @pytest.mark.no_mock_config
-def test_main_db_created(tmp_config, tmp_get_engine):
+def test_main_db_created(tmp_config):
     config = tmp_config
     db_path = config['paths']['database']
     assert not os.path.exists(db_path)
