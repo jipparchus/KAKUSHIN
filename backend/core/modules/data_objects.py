@@ -14,7 +14,7 @@ import pandas as pd
 from backend.core.modules.video_utils import standardize_fsize
 from backend.core.modules.mask_utils import Masker
 from backend.core.modules.mass import get_mass_all
-from backend.core.modules.body_keypoints import get_com_part_simple, get_contact_coords, get_edge_col_all, get_edge_coords_all
+from backend.core.modules.body_keypoints import get_com_part_simple, get_contact_coords, get_edge_col_all, get_edge_coords_all, get_kp_idx
 
 
 
@@ -595,16 +595,17 @@ class PointCloudData:
 @dataclass
 class ContactPoints:
     coords: np.ndarray  # 2d or 3d coords at the frame t
+    confidence: np.ndarray
     t: int  # frame_number
     direc_contact: str
 
     def __post_init__(self):
         with open(self.direc_contact, 'rb') as f:
             self.dict_contacts = pickle.load(f)
-        self.hand_l = {'state': 0, 'coords': [0, 0, 0]}
-        self.hand_r = {'state': 0, 'coords': [0, 0, 0]}
-        self.foot_l = {'state': 0, 'coords': [0, 0, 0]}
-        self.foot_r = {'state': 0, 'coords': [0, 0, 0]}
+        self.hand_l = {'state': 0, 'coords': [0, 0, 0], 'conf': 0}
+        self.hand_r = {'state': 0, 'coords': [0, 0, 0], 'conf': 0}
+        self.foot_l = {'state': 0, 'coords': [0, 0, 0], 'conf': 0}
+        self.foot_r = {'state': 0, 'coords': [0, 0, 0], 'conf': 0}
         self.dict_points = {
             'hand_l': self.hand_l,
             'hand_r': self.hand_r,
@@ -613,6 +614,7 @@ class ContactPoints:
         }
         self.get_state()
         self.get_coords()
+        self.get_conf()
 
     def get_state(self):
         for ll, dd in zip(('Hand_L', 'Hand_R', 'Foot_L', 'Foot_R'), list(self.dict_points.values())):
@@ -624,22 +626,28 @@ class ContactPoints:
         for coords, dd in zip(get_contact_coords(self.coords), list(self.dict_points.values())):
             dd['coords'] = coords
 
+    def get_conf(self):
+        for part, dd in zip(['wrist_l', 'wrist_r', 'foot_index_l', 'foot_index_r'], list(self.dict_points.values())):
+            print(get_kp_idx(part), type(get_kp_idx(part)))
+            print('conf: ', self.confidence[get_kp_idx(part)])
+            dd['conf'] = self.confidence[get_kp_idx(part)]
+
 
 @dataclass
 class Body:
     t: int  # frame_number
     coords2d: np.ndarray
     coords3d: np.ndarray
-    # coords2d_confidence: np.ndarray
-    # coords3d_confidence: np.ndarray
+    coords2d_confidence: np.ndarray
+    coords3d_confidence: np.ndarray
     direc_contact: str
 
     def __post_init__(self):
         self.mass = get_mass_all()
         self.dict_com3d = get_com_part_simple(self.coords3d)
         # self.contact_points3d = ContactPoints(self.coords3d, self.t, self.direc_contact)
-        self.contact_points3d = ContactPoints(self.coords3d, self.t, self.direc_contact)
-        self.contact_points2d = ContactPoints(self.coords2d, self.t, self.direc_contact)
+        self.contact_points3d = ContactPoints(self.coords3d, self.coords3d_confidence, self.t, self.direc_contact)
+        self.contact_points2d = ContactPoints(self.coords2d, self.coords2d_confidence, self.t, self.direc_contact)
         self.edges3d = get_edge_coords_all(self.coords3d)
         self.edges_col = get_edge_col_all()
 
