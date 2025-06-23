@@ -9,10 +9,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 import mediapipe as mp
-
+import pandas as pd
 
 from backend.core.modules.video_utils import standardize_fsize
 from backend.core.modules.mask_utils import Masker
+from backend.core.modules.mass import get_mass_all
+from backend.core.modules.body_keypoints import get_com_part_simple, get_contact_coords, get_edge_col_all, get_edge_coords_all
+
 
 
 @dataclass
@@ -30,7 +33,7 @@ class CameraData:
              [0, self.fy, self.cy],
              [0, 0, 1]]
         )
-        self.distortion_coeff = self.matrix_dict['dist_coeffs']
+        self.distortion_coeff = np.array(self.matrix_dict['dist_coeffs'])
 
 
 @dataclass
@@ -115,6 +118,7 @@ class VideoData:
     def get_human_pose(self):
         human_pose = HumanPose(video=self)
         coords3d, coords2d, coords3d_confidence, coords2d_confidence = human_pose.get_3dpose(save=True, get_2dpose=True)
+        return human_pose
 
     def get_point_cloud(self):
 
@@ -246,18 +250,18 @@ class HumanPose:
 
         coords3d = []
         coords2d = []
-        coords3d_confidence = []
-        coords2d_confidence = []
+        self.coords3d_confidence = []
+        self.coords2d_confidence = []
 
         with self.mp_holistic.Holistic(min_detection_confidence=0.4, min_tracking_confidence=0.4) as holistic:
             for frame in self.video.iter_frames_streaming():
                 # while self.video.vcap.isOpened():
                 #     ret, frame = self.video.vcap.read()
                 try:
-                    nx, ny, nz = frame.shape
+                    # nx, ny, nz = frame.shape
 
-                    def coords_conversion(array):
-                        return tuple(np.multiply(array, [ny, nx]).astype(int))
+                    # def coords_conversion(array):
+                    #     return tuple(np.multiply(array, [ny, nx]).astype(int))
                     # BGR to RGB
                     img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     img2show = cv2.addWeighted(src1=img, alpha=0.9, src2=adaptive_thld(img), beta=0.1, gamma=0)
@@ -266,12 +270,12 @@ class HumanPose:
 
                     landmarks_3d = [results.pose_world_landmarks.landmark[lm] for lm in mp.solutions.pose.PoseLandmark]
                     coords3d.append(np.array([(lm.x, lm.y, lm.z) for lm in landmarks_3d]))
-                    coords3d_confidence.append(np.array([lm.visibility for lm in landmarks_3d]))
+                    self.coords3d_confidence.append(np.array([lm.visibility for lm in landmarks_3d]))
 
                     if get_2dpose:
                         landmarks_2d = [results.pose_landmarks.landmark[lm] for lm in mp.solutions.pose.PoseLandmark]
-                        coords2d.append(np.array([(lm.x, lm.y) for lm in landmarks_2d]))
-                        coords2d_confidence.append(np.array([lm.visibility for lm in landmarks_2d]))
+                        coords2d.append(np.array([(self.video.width*lm.x, self.video.height*lm.y) for lm in landmarks_2d]))
+                        self.coords2d_confidence.append(np.array([lm.visibility for lm in landmarks_2d]))
 
                     if save:
                         self.mp_drawing.draw_landmarks(img2show, results.pose_landmarks, self.mp_holistic.POSE_CONNECTIONS,
@@ -289,7 +293,9 @@ class HumanPose:
                 except AttributeError:
                     break
 
-            coords3d, coords2d = np.array(coords3d), np.array(coords2d)
+            # self.coords2d = np.array([convert_pose2d_coords(np.array(coords2d), t) for t in range(self.video.total_frames)])
+            self.coords2d = np.array(coords2d)
+            self.coords3d = np.array(coords3d)
 
             self.video.vcap.release()
             if save:
@@ -298,19 +304,19 @@ class HumanPose:
 
         if save:
             with open(self.direc_saveas_3d, 'wb') as f:
-                pickle.dump(coords3d, f)
+                pickle.dump(self.coords3d, f)
 
             with open(self.direc_saveas_3d_cnf, 'wb') as f:
-                pickle.dump(coords3d_confidence, f)
+                pickle.dump(self.coords3d_confidence, f)
 
             if get_2dpose:
                 with open(self.direc_saveas_2d, 'wb') as f:
-                    pickle.dump(coords2d, f)
+                    pickle.dump(self.coords2d, f)
 
                 with open(self.direc_saveas_2d_cnf, 'wb') as f:
-                    pickle.dump(coords2d_confidence, f)
+                    pickle.dump(self.coords2d_confidence, f)
 
-        return coords3d, coords2d, coords3d_confidence, coords2d_confidence
+        return self.coords3d, self.coords2d, self.coords3d_confidence, self.coords2d_confidence
 
 
 @dataclass
@@ -586,38 +592,74 @@ class PointCloudData:
         return pcd_combined
 
 
-# class Body:
-#     def __init__(self, frame_number):
-#         self.t = frame_number
-#         self.mass = get_mass_all()
-#         self.coords3d, self.coords2d = clean_coord(coords3d, coords2d)
-#         self.coords3d_conf, self.coords2d_conf = coords3d_confidence, coords2d_confidence
-#         # self.coords3d, self.coords2d = coords3d, coords2d
-#         self.dict_com3d = get_com_part_simple(self.coords3d[self.t])
-#         self.dict_com2d = get_com_part_simple(self.coords2d[self.t])
-#         self.contact_points3d = ContactPoints(self.coords3d, self.t)
-#         self.contact_points2d = ContactPoints(self.coords2d, self.t)
-#         self.edges3d = get_edge_coords_all(self.coords3d[self.t])
-#         self.edges2d = get_edge_coords_all(self.coords2d[self.t])
-#         self.edges_col = get_edge_col_all()
+@dataclass
+class ContactPoints:
+    coords: np.ndarray  # 2d or 3d coords at the frame t
+    t: int  # frame_number
+    direc_contact: str
 
-#     def plot(self, ax):
-#         for coords, col in zip(self.edges3d.values(), self.edges_col.values()):
-#             p0, p1 = coords
-#             xs, ys, zs = [p0[0], p1[0]], [p0[1], p1[1]], [p0[2], p1[2]]
-#             ax.plot(xs, ys, zs, c=col)
+    def __post_init__(self):
+        with open(self.direc_contact, 'rb') as f:
+            self.dict_contacts = pickle.load(f)
+        self.hand_l = {'state': 0, 'coords': [0, 0, 0]}
+        self.hand_r = {'state': 0, 'coords': [0, 0, 0]}
+        self.foot_l = {'state': 0, 'coords': [0, 0, 0]}
+        self.foot_r = {'state': 0, 'coords': [0, 0, 0]}
+        self.dict_points = {
+            'hand_l': self.hand_l,
+            'hand_r': self.hand_r,
+            'foot_l': self.foot_l,
+            'foot_r': self.foot_r
+        }
+        self.get_state()
+        self.get_coords()
 
-#         for point in self.contact_points3d.dict_points.values():
-#             col = 'white'
-#             if point['state'] == 1:
-#                 col = 'orange'
-#             x, y, z = point['coords']
-#             ax.scatter(x, y, z, marker='o', c=col, edgecolors='k', s=30)
+    def get_state(self):
+        for ll, dd in zip(('Hand_L', 'Hand_R', 'Foot_L', 'Foot_R'), list(self.dict_points.values())):
+            dd['state'] = self.dict_contacts[ll][self.t]
+            # dd['state'] = self.dict_contacts[ll]
 
-#         for key, val in self.dict_com3d.items():
-#             x, y, z = val
-#             ax.scatter(x, y, z, marker='o', c='green', edgecolors='k', s=50)
-#         ax.set_xlabel("x")
-#         ax.set_ylabel("y")
-#         ax.set_zlabel("z")
-#         return ax
+    def get_coords(self):
+        # for coords, dd in zip(get_contact_coords(self.coords[self.t]), list(self.dict_points.values())):
+        for coords, dd in zip(get_contact_coords(self.coords), list(self.dict_points.values())):
+            dd['coords'] = coords
+
+
+@dataclass
+class Body:
+    t: int  # frame_number
+    coords2d: np.ndarray
+    coords3d: np.ndarray
+    # coords2d_confidence: np.ndarray
+    # coords3d_confidence: np.ndarray
+    direc_contact: str
+
+    def __post_init__(self):
+        self.mass = get_mass_all()
+        self.dict_com3d = get_com_part_simple(self.coords3d)
+        # self.contact_points3d = ContactPoints(self.coords3d, self.t, self.direc_contact)
+        self.contact_points3d = ContactPoints(self.coords3d, self.t, self.direc_contact)
+        self.contact_points2d = ContactPoints(self.coords2d, self.t, self.direc_contact)
+        self.edges3d = get_edge_coords_all(self.coords3d)
+        self.edges_col = get_edge_col_all()
+
+    def plot(self, ax, size_contact=30, size_com=50):
+        for coords, col in zip(self.edges3d.values(), self.edges_col.values()):
+            p0, p1 = coords
+            xs, ys, zs = [p0[0], p1[0]], [p0[1], p1[1]], [p0[2], p1[2]]
+            ax.plot(xs, ys, zs, c=col)
+
+        for point in self.contact_points3d.dict_points.values():
+            col = 'white'
+            if point['state'] == 1:
+                col = 'orange'
+            x, y, z = point['coords']
+            ax.scatter(x, y, z, marker='o', c=col, edgecolors='k', s=size_contact)
+
+        for key, val in self.dict_com3d.items():
+            x, y, z = val
+            ax.scatter(x, y, z, marker='o', c='green', edgecolors='k', s=size_com)
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_zlabel("z")
+        return ax

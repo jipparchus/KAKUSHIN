@@ -40,3 +40,7 @@ class Masker:
         new_mask[:, :margin] = 0
         new_mask[:, -margin:] = 0
         return new_mask
+
+    def annotated_frame(self, frame):
+        result = self.model.track(frame)[0]
+        return result

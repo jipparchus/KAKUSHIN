@@ -27,6 +27,14 @@ backend/config.yaml
 backend/env
 backend/.mypy_cache/
 
+# Some pkl and movies
+backend/_2dpose.pkl
+backend/_2dpose_confidence.pkl
+backend/_3dpose.pkl
+backend/_3dpose_confidence.pkl
+backend/_humanpose.mp4
+
+
 # auth
 
 

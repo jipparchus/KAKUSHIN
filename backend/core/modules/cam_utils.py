@@ -65,3 +65,14 @@ def draw_calibration_overlay(img, corners, pattern_size):
     # Encode back to JPEG
     success, encoded_img = cv2.imencode('.jpg', img)
     return encoded_img.tobytes() if success else None
+
+
+def get_extrinsic_matrix(rvec, tvec):
+    """
+    Extrinsic matrix
+    """
+    T = np.eye(4)
+    R, _ = cv2.Rodrigues(rvec)
+    T[:3, :3] = R
+    T[:3, 3] = tvec.flatten()
+    return T
