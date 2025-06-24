@@ -25,7 +25,8 @@ This is created based on ideas shown in https://github.com/jipparchus/Gamba.
 
 ## Concept Testing
 
-[![concept_test_animation](https://i3.ytimg.com/vi/7uWb7XOdLeM/sddefault.jpg)](https://youtu.be/7uWb7XOdLeM?si=7Y_7BfOQx9DI-j4g)
+![](database/animation_light.gif)
+*[YouTube link](https://youtu.be/7uWb7XOdLeM?si=7Y_7BfOQx9DI-j4g)*
 
 Condition:
 - A 3D mesh model of Moonboard is created using smartphone
