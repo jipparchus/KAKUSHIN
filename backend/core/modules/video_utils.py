@@ -98,3 +98,14 @@ def get_depth_video(video_path):
 
     except RuntimeError:
         print('Error in video depth estimation.')
+
+
+def frame_to_timestamp(frame_number, fps_video):
+    """
+    Returns the timestamp from video frame number and fps
+    """
+    time_sec = frame_number / fps_video
+    minutes = int(time_sec // 60)
+    seconds = int(time_sec % 60)
+    milliseconds = int((time_sec * 1000) % 1000)
+    return f'{minutes:02}:{seconds:02}.{milliseconds:03}'

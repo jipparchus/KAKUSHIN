@@ -10,12 +10,12 @@ import matplotlib.pyplot as plt
 import copy
 import mediapipe as mp
 import pandas as pd
+from ultralytics import YOLO
 
 from backend.core.modules.video_utils import standardize_fsize
 from backend.core.modules.mask_utils import Masker
 from backend.core.modules.mass import get_mass_all
 from backend.core.modules.body_keypoints import get_com_part_simple, get_contact_coords, get_edge_col_all, get_edge_coords_all, get_kp_idx
-
 
 
 @dataclass
@@ -119,6 +119,25 @@ class VideoData:
         human_pose = HumanPose(video=self)
         coords3d, coords2d, coords3d_confidence, coords2d_confidence = human_pose.get_3dpose(save=True, get_2dpose=True)
         return human_pose
+
+    def predict_yolo(self, yolomodel='core/models/best.pt'):
+        """
+        Returns the generator of the results
+        """
+        self.model = YOLO(yolomodel)
+        # Generator of the results
+        results = self.model(self.path, stream=True, verbose=False)
+        return results
+
+    def get_mask_frame(self, frame, yolomodel='core/models/best.pt', conf=0.3, cls2include=[0], cls2exclude=[1, 2]):
+        masker = Masker(yolomodel)
+        return masker.apply_mask_frame(frame, conf, cls2include, cls2exclude)
+
+    def get_masks(self, yolomodel='core/models/best.pt', predict_res_generator=None, conf=0.3, cls2include=[0], cls2exclude=[1, 2]):
+        masker = Masker(yolomodel)
+        if predict_res_generator is None:
+            predict_res_generator = self.predict_yolo(yolomodel)
+        return masker.apply_mask(predict_res_generator, [self.height, self.width], conf, cls2include, cls2exclude)
 
     def get_point_cloud(self):
 
@@ -628,22 +647,23 @@ class ContactPoints:
 
     def get_conf(self):
         for part, dd in zip(['wrist_l', 'wrist_r', 'foot_index_l', 'foot_index_r'], list(self.dict_points.values())):
-            print(get_kp_idx(part), type(get_kp_idx(part)))
-            print('conf: ', self.confidence[get_kp_idx(part)])
             dd['conf'] = self.confidence[get_kp_idx(part)]
 
 
 @dataclass
 class Body:
+    _weight: float
     t: int  # frame_number
     coords2d: np.ndarray
-    coords3d: np.ndarray
+    _coords3d: np.ndarray
     coords2d_confidence: np.ndarray
     coords3d_confidence: np.ndarray
     direc_contact: str
 
     def __post_init__(self):
-        self.mass = get_mass_all()
+        self.weight = self._weight
+        self.coords3d = self._coords3d
+        self.mass = get_mass_all(self.weight)
         self.dict_com3d = get_com_part_simple(self.coords3d)
         # self.contact_points3d = ContactPoints(self.coords3d, self.t, self.direc_contact)
         self.contact_points3d = ContactPoints(self.coords3d, self.coords3d_confidence, self.t, self.direc_contact)
@@ -651,23 +671,64 @@ class Body:
         self.edges3d = get_edge_coords_all(self.coords3d)
         self.edges_col = get_edge_col_all()
 
-    def plot(self, ax, size_contact=30, size_com=50):
+    @property
+    def weight(self):
+        return self._weight
+
+    @weight.setter
+    def weight(self, new_weight):
+        self.mass = get_mass_all(new_weight)
+
+    @property
+    def coords3d(self):
+        return self._coords3d
+
+    @coords3d.setter
+    def coords3d(self, new_coords3d):
+        self._coords3d = new_coords3d
+        # Update dependent attributes
+        self.dict_com3d = get_com_part_simple(new_coords3d)
+        self.contact_points3d = ContactPoints(new_coords3d, self.coords3d_confidence, self.t, self.direc_contact)
+        self.edges3d = get_edge_coords_all(new_coords3d)
+
+    def plot(self, ax, size_contact=30, size_com=50, dimensions='3d'):
         for coords, col in zip(self.edges3d.values(), self.edges_col.values()):
             p0, p1 = coords
             xs, ys, zs = [p0[0], p1[0]], [p0[1], p1[1]], [p0[2], p1[2]]
-            ax.plot(xs, ys, zs, c=col)
+            if dimensions == '3d':
+                ax.plot(xs, ys, zs, c=col)
+            elif dimensions == 'xy':
+                ax.plot(xs, ys, c=col)
+            elif dimensions == 'zy':
+                ax.plot(zs, ys, c=col)
+            elif dimensions == 'xz':
+                ax.plot(xs, zs, c=col)
 
         for point in self.contact_points3d.dict_points.values():
             col = 'white'
             if point['state'] == 1:
                 col = 'orange'
             x, y, z = point['coords']
-            ax.scatter(x, y, z, marker='o', c=col, edgecolors='k', s=size_contact)
+            kwargs = dict(marker='o', c=col, edgecolors='k', s=size_contact)
+            if dimensions == '3d':
+                ax.scatter(x, y, z, **kwargs)
+            elif dimensions == 'xy':
+                ax.scatter(x, y, **kwargs)
+            elif dimensions == 'zy':
+                ax.scatter(z, y, **kwargs)
+            elif dimensions == 'xz':
+                ax.scatter(x, z, **kwargs)
 
         for key, val in self.dict_com3d.items():
             x, y, z = val
-            ax.scatter(x, y, z, marker='o', c='green', edgecolors='k', s=size_com)
-        ax.set_xlabel("x")
-        ax.set_ylabel("y")
-        ax.set_zlabel("z")
+            s = size_com * 1.5 if key == 'total' else size_com
+            kwargs = dict(marker='^', c='green', edgecolors='k', s=s)
+            if dimensions == '3d':
+                ax.scatter(x, y, z, **kwargs)
+            elif dimensions == 'xy':
+                ax.scatter(x, y, **kwargs)
+            elif dimensions == 'zy':
+                ax.scatter(z, y, **kwargs)
+            elif dimensions == 'xz':
+                ax.scatter(x, z, **kwargs)
         return ax

@@ -98,11 +98,43 @@ PARTS = {
     'arm_r': ['a_r'],
     'thigh_l': ['thigh_l'],
     'thigh_r': ['thigh_r'],
-    'lower_leg_l': ['shin_l', 'foot_top_l', 'foot_btm_l', 'foot_heel_l'],
-    'lower_leg_r': ['shin_r', 'foot_top_r', 'foot_btm_r', 'foot_heel_r'],
+    'lowerleg_l': ['shin_l', 'foot_top_l', 'foot_btm_l', 'foot_heel_l'],
+    'lowerleg_r': ['shin_r', 'foot_top_r', 'foot_btm_r', 'foot_heel_r'],
     'body': ['side_l', 'side_r', 'sh', 'hp'],
     'head': ['face_l', 'face_r']
 }
+
+color_map = {
+    'eye': '#000000',
+    'ear': '#000000',
+    'mouth': '#000000',
+    'nose': '#1f77b4',
+    'shoulder': '#ff7f0e',
+    'elbow': '#2ca02c',
+    'wrist': '#d62728',
+    'pinky': '#9467bd',
+    'index': '#17becf',
+    'thumb': '#8c564b',
+    'hip': '#e377c2',
+    'knee': '#7f7f7f',
+    'ankle': '#bcbd22',
+    'heel': '#17becf',
+    'foot_index': '#1f77b4',
+}
+
+
+def get_plot_style(kp):
+    for key in color_map:
+        if key in kp:
+            color = color_map[key]
+            if kp.endswith('_l'):
+                linestyle = 'solid'
+            elif kp.endswith('_r'):
+                linestyle = 'dashed'
+            else:
+                linestyle = 'dotted'
+            return color, linestyle
+    return 'black', 'solid'
 
 
 def get_KEYPOINTS():
@@ -173,6 +205,9 @@ def get_com_part_simple(coords):
         else:
             com = np.mean([np.mean(get_edge_coords(coords, edge), axis=0) for edge in edges], axis=0)
         dict_com_parts[part] = com
+    # Total com as whole body
+    coms = np.array([v for _, v in dict_com_parts.items()])
+    dict_com_parts['total'] = np.mean(coms, axis=0)
     return dict_com_parts
 
 

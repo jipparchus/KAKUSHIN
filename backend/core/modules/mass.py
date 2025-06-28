@@ -1,19 +1,23 @@
 # Centre of Mass calculations
 
-mass = {
+mass_percent = {
     'head': 0.08,
     'body': 0.46,
     'arm': 0.03,
-    'arm_fore': 0.02,
+    'forearm': 0.02,
     'thigh': 0.11,
-    'shank': 0.05
+    'lowerleg': 0.05
 }
 
 
-def get_mass_all():
-    return mass
+def get_mass_all(weight):
+    dict_mass = {
+        part: weight * mass_percent[part] for part in mass_percent.keys()
+    }
+    dict_mass['total'] = weight
+    return dict_mass
 
 
-def get_mass(part: str):
-    if part in mass.keys():
-        return mass[part]
+def get_mass(weight, part: str):
+    if part in mass_percent.keys():
+        return mass_percent[part] * weight

@@ -8,7 +8,32 @@ class Masker:
     def __init__(self, model_name='models/yolov8x-seg.pt'):
         self.model = YOLO(model_name)
 
-    def apply_mask(self, frame, threshold=0.5, cls2include=[0], cls2exclude=[1, 2]):
+    def apply_mask(self, results_gen, frame_shape, threshold=0.5, cls2include=[0], cls2exclude=[1, 2]):
+        """
+        Apply the mask for whole video
+        results_ge: prediction results generator. result of model(src, stream=True)
+        """
+        masks = []
+        for results in results_gen:
+            # class 0: human
+            # Mask initialisation
+            mask_combined = np.zeros(tuple(frame_shape), dtype=np.uint8)
+
+            for i, cls in enumerate(results.boxes.cls):
+                if int(cls) in cls2include:
+                    mask = results.masks.data[i].cpu().numpy()
+                    mask_resized = cv2.resize(mask, (frame_shape[1], frame_shape[0]), interpolation=cv2.INTER_NEAREST)
+                    mask_combined[mask_resized > threshold] = 255
+                elif int(cls) in cls2exclude:
+                    mask = results.masks.data[i].cpu().numpy()
+                    # Dilate the mask to ensure the ccoverage
+                    mask_dilated = cv2.dilate(mask, kernel=np.ones((25, 25), np.uint8), iterations=1)
+                    mask_resized = cv2.resize(mask_dilated, (frame_shape[1], frame_shape[0]), interpolation=cv2.INTER_NEAREST)
+                    mask_combined[mask_resized > threshold] = 0
+            masks.append(mask_combined)
+        return masks  # 255 = wall, 0 = background
+
+    def apply_mask_frame(self, frame, threshold=0.5, cls2include=[0], cls2exclude=[1, 2]):
         # class 0: human
         results = self.model(frame)[0]
         # Mask initialisation
