@@ -89,6 +89,15 @@ frontend/web
 # DATABASE (database/)
 # ========================
 database/*.db
+database/*.pkl
+database/*.mp4
+database/*.gif
+database/*.blend
+database/*.blend1
+database/MB2024/
+database/tests/
+database/tests/
+database/results/
 database/assets/
 database/uploads/
 database/secrets/
