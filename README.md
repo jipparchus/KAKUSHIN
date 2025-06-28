@@ -49,6 +49,9 @@ This is created based on ideas shown in https://github.com/jipparchus/Gamba.
 
 **Conditions**:
 - A 3D mesh model of Moonboard is created using smartphone app (RealityScan)
+  <p>
+  <img src="database/README/wall_model.gif" width="32.9%"/>
+</p>
 - Rendering perspective is approximately alighned with that of the video frames
 - Contact of hands/feet is recorded manually using the annotation tool in https://github.com/jipparchus/Gamba.
 
