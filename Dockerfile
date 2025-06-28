@@ -41,8 +41,12 @@ WORKDIR /backend
 
 # Install python package dependencies
 RUN python -m pip install --upgrade pip
-COPY /backend/requirements.txt ./requirements.txt
-RUN conda run -n kakushin pip install --no-cache-dir -r requirements.txt
+# COPY /backend/requirements.txt ./requirements.txt
+COPY backend /backend
+RUN ls -l /backend
+RUN ls -l /backend/routes
+
+RUN conda run -n kakushin pip install --no-cache-dir -r /backend/requirements.txt
 
 # Set Python path
 ENV PYTHONPATH=/backend
