@@ -35,25 +35,24 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ffmpeg libsm6 libxext6 libgl1-mesa-glx && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+    
+# Install python package dependencies
+RUN python -m pip install --upgrade pip
+# COPY /backend/requirements.txt ./requirements.txt
+# COPY ./backend /backend
+COPY backend /backend
 
 # Set working directory
 WORKDIR /backend
 
-# Install python package dependencies
-RUN python -m pip install --upgrade pip
-# COPY /backend/requirements.txt ./requirements.txt
-COPY backend /backend
-RUN ls -l /backend
-RUN ls -l /backend/routes
-
-RUN conda run -n kakushin pip install --no-cache-dir -r /backend/requirements.txt
+RUN conda run -n kakushin pip install --no-cache-dir -r requirements.txt
 
 # Set Python path
 ENV PYTHONPATH=/backend
 
 # Expose FastAPI port
 EXPOSE 8000
-
+RUN ls
 # Start FastAPI server
 # --host 0.0.0.0: the server will listen to ALL internal IPs inside container
 # EXPOSE 8000: tells docker that container will open 8000

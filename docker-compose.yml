@@ -8,7 +8,7 @@ services:
       - "8000:8000"    # Maps host 8000 to container 8000, expose FastAPI
       - "8888:8888"   # For Jupyter notebook, open by jupyter notebook --ip 0.0.0.0 --port 8888 --allow-root
     volumes:
-      - /mnt/e/KAKUSHIN/backend:/backend  # Mount Windows folder project/backend ↔ Docker container folder /backend
+      # - /mnt/e/KAKUSHIN/backend:/backend  # Mount Windows folder project/backend ↔ Docker container folder /backend
       - /mnt/e/KAKUSHIN/database:/database
     env_file:
       - .env
@@ -17,7 +17,7 @@ services:
         reservations:
           devices:
             - capabilities: [gpu]
-    shm_size: "8g"  # Allow big shared memory
+    # shm_size: "8g"  # Allow big shared memory
     runtime: nvidia  # Enable GPU passthrough (older Docker) if needed
     environment:
       - NVIDIA_VISIBLE_DEVICES=all

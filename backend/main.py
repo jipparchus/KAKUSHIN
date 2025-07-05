@@ -28,6 +28,8 @@ from backend.routes import user_info
 import backend.db.init_rdb as init_rdb
 
 
+print("✅ MAIN.PY LOADED")
+
 """
 Start API
 """
