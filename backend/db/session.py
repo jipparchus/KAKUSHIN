@@ -34,5 +34,8 @@ def get_engine():
 
 def get_session_local():
     engine = get_engine()
-    SessionLocal = sessionmaker(bind=engine)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     return SessionLocal()
+
+
+engine = get_engine()

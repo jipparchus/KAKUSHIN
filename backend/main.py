@@ -42,6 +42,16 @@ app.include_router(auth.router, prefix="/auth")
 app.include_router(user_info.router, prefix="/user")
 app.include_router(upload.router, prefix="/upload")
 
+"""
+Database initialisation
+"""
+
+
+@app.on_event("startup")
+def on_startup():
+    report = init_rdb.main()
+    print(report)
+
 
 @app.exception_handler(RequestValidationError)
 async def handler(request: Request, exc: RequestValidationError):
@@ -52,11 +62,3 @@ async def handler(request: Request, exc: RequestValidationError):
     print('EXC:\n', exc)
     print('###############################################')
     return JSONResponse(content={}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-
-if __name__ == '__main__':
-    """
-    Database initialisation
-    """
-    report = init_rdb.main()
-    print(report)

@@ -5,7 +5,7 @@ import os
 from backend import config
 
 # DATABASE MODELS
-from backend.db.models import Base
+from backend.db.models import Base, User, CameraMatrix, Climb, SharedClimb
 from backend.db.session import get_engine
 
 
