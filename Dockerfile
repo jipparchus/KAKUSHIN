@@ -48,7 +48,7 @@ WORKDIR /backend
 RUN conda run -n kakushin pip install --no-cache-dir -r requirements.txt
 
 # Set Python path
-ENV PYTHONPATH=/backend
+ENV PYTHONPATH=/
 
 # Expose FastAPI port
 EXPOSE 8000
