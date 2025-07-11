@@ -55,7 +55,8 @@ This is created based on ideas shown in https://github.com/jipparchus/Gamba.
 - Rendering perspective is approximately alighned with that of the video frames
 - Contact of hands/feet is recorded manually using the annotation tool in https://github.com/jipparchus/Gamba.
 
-Future Plan:
+
+**Future Plan**:
 - [ ] Stabilise the human pose through the frames.
 - [ ] Multi-threading to speed up analysis and animation creation. (It takes ~15 min now)
 - [ ] Visualisation of angular momentum in 3D plots
@@ -64,6 +65,10 @@ Future Plan:
 - [ ] Optimised rendering perspective estimation.
 - [ ] Getting rendering perspective to video frame perspective transformation matrix
 - [ ] Train an AI model to automate climber-wall contact state detection
+
+  <p>
+    <img src="database/README/threejs.gif" width="99%"/>
+  </p>
 
 **1. Feature Point Matching**
 
