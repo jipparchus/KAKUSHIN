@@ -26,6 +26,9 @@ This is created based on ideas shown in https://github.com/jipparchus/Gamba.
 ## Concept Testing
 
 ### 3D Animations
+  <p>
+    <img src="database/README/threejs.gif" width="99%"/>
+  </p>
 
 <p>
   <img src="database/README/animation_2d_2.gif" width="38%"/>
@@ -55,20 +58,12 @@ This is created based on ideas shown in https://github.com/jipparchus/Gamba.
 - Rendering perspective is approximately alighned with that of the video frames
 - Contact of hands/feet is recorded manually using the annotation tool in https://github.com/jipparchus/Gamba.
 
+## Methodology
 
-**Future Plan**:
-- [ ] Stabilise the human pose through the frames.
-- [ ] Multi-threading to speed up analysis and animation creation. (It takes ~15 min now)
-- [ ] Visualisation of angular momentum in 3D plots
-- [ ] Impremenation of the frontend
-- [ ] Analysing the pose coordinates over frames and smooth the moves, exclude non-physical motions.
-- [ ] Optimised rendering perspective estimation.
-- [ ] Getting rendering perspective to video frame perspective transformation matrix
-- [ ] Train an AI model to automate climber-wall contact state detection
+<p>
+  <img src="database/README/kakushin_workflow_0.drawio.svg" width="100%"/>
+</p>
 
-  <p>
-    <img src="database/README/threejs.gif" width="99%"/>
-  </p>
 
 **1. Feature Point Matching**
 
@@ -146,3 +141,15 @@ As a side effect, the consistency of the body part lengths are broken. Need a fu
 - Impulse ($\Delta \vec{p}$): Change of the linear momentum. It is also a product of the timestep ($\Delta t$) and the average net force ($\bar{F}$).
 - Angular Velocity ($\vec{\omega}$): Speed of rotation around an axis. Computed for left and right thigh, shank, upper & lower arm around the keypoints of the pose connected i.e. waist, knee, shoulder, and elbow.
 - Angular Momentum ($\vec{L}$): Computing $I \vec{\omega}$ for each part, where $I$ is the moment of inertia.
+
+
+**Future Plan**:
+- [ ] Stabilise the human pose through the frames.
+- [ ] Multi-threading to speed up analysis and animation creation. (It takes ~15 min now)
+- [ ] Visualisation of angular momentum in 3D plots
+- [ ] Impremenation of the frontend
+- [ ] Analysing the pose coordinates over frames and smooth the moves, exclude non-physical motions.
+- [ ] Optimised rendering perspective estimation.
+- [ ] Getting rendering perspective to video frame perspective transformation matrix
+- [ ] Train an AI model to automate climber-wall contact state detection
+
